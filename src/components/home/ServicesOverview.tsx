@@ -1,0 +1,118 @@
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { 
+  Camera, 
+  Film, 
+  FileVideo, 
+  Mic2, 
+  Sparkles,
+  Calendar,
+  ArrowUpRight
+} from "lucide-react";
+import { SectionHeading } from "../ui/SectionHeading";
+
+const services = [
+  {
+    icon: Camera,
+    title: "Content Creation",
+    description: "Stunning visuals for brands and influencers. Photography and video that captivates your audience.",
+    link: "/services#content",
+  },
+  {
+    icon: Film,
+    title: "Commercial Production",
+    description: "High-impact promotional videos and adverts that capture your brand's essence.",
+    link: "/services#commercials",
+  },
+  {
+    icon: FileVideo,
+    title: "Documentary",
+    description: "Compelling documentary and docu-series production that tells stories worth sharing.",
+    link: "/services#documentary",
+  },
+  {
+    icon: Sparkles,
+    title: "Tourism Media",
+    description: "Scenic visuals and campaign videos that showcase destinations at their finest.",
+    link: "/services#tourism",
+  },
+  {
+    icon: Mic2,
+    title: "Podcast Studio",
+    description: "Professional audio and video podcast production in our state-of-the-art studio.",
+    link: "/services#podcast",
+  },
+  {
+    icon: Calendar,
+    title: "Event Coverage",
+    description: "Festival, conference, and corporate event media coverage that captures every moment.",
+    link: "/services#events",
+  },
+];
+
+export const ServicesOverview = () => {
+  return (
+    <section className="section-padding bg-background relative overflow-hidden">
+      {/* Background Accent */}
+      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-charcoal/50 to-transparent pointer-events-none" />
+      
+      <div className="container mx-auto px-6 lg:px-8 relative z-10">
+        <SectionHeading
+          label="Our Services"
+          title="Complete Media Solutions"
+          subtitle="From concept to delivery, we offer end-to-end media production services tailored to your vision."
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          {services.map((service, index) => (
+            <motion.div
+              key={service.title}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+            >
+              <Link
+                to={service.link}
+                className="group block h-full p-8 bg-card border border-border rounded-lg hover:border-primary/50 transition-all duration-500 hover:shadow-glow"
+              >
+                <div className="flex items-start justify-between mb-6">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
+                    <service.icon size={24} />
+                  </div>
+                  <ArrowUpRight 
+                    size={20} 
+                    className="text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:text-primary transition-all duration-300 transform group-hover:translate-x-1 group-hover:-translate-y-1" 
+                  />
+                </div>
+                <h3 className="font-heading text-xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">
+                  {service.title}
+                </h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  {service.description}
+                </p>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="text-center mt-12"
+        >
+          <Link
+            to="/services"
+            className="btn-outline-gold inline-flex items-center gap-2 text-sm uppercase tracking-wider"
+          >
+            View All Services
+            <ArrowUpRight size={16} />
+          </Link>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
