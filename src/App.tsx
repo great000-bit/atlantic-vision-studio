@@ -12,6 +12,8 @@ import Studios from "./pages/Studios";
 import Events from "./pages/Events";
 import Contact from "./pages/Contact";
 import Portal from "./pages/Portal";
+import PortalDashboard from "./pages/PortalDashboard";
+import Blog from "./pages/Blog";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +35,9 @@ const App = () => (
           <Route path="/events" element={<Events />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/portal" element={<Portal />} />
+          <Route path="/portal/dashboard" element={<PortalDashboard />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:id" element={<Blog />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

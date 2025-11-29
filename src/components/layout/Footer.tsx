@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Instagram, Youtube, Linkedin, Mail, MapPin, Phone } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 const footerLinks = {
   company: [
@@ -16,9 +17,10 @@ const footerLinks = {
   ],
   creators: [
     { name: "Join Collective", path: "/creators" },
+    { name: "Artist Portal", path: "/portal" },
     { name: "Studio Spaces", path: "/studios" },
     { name: "Event Coverage", path: "/events" },
-    { name: "Creator Portal", path: "/portal" },
+    { name: "Blog", path: "/blog" },
   ],
 };
 
@@ -35,10 +37,10 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
           {/* Brand Column */}
           <div className="lg:col-span-2">
-            <Link to="/" className="inline-block mb-6">
-              <span className="font-heading text-2xl font-bold tracking-tight">
-                <span className="text-foreground">ATLANTIC</span>
-                <span className="text-primary ml-2">CREATORS</span>
+            <Link to="/" className="inline-flex items-center gap-3 mb-6">
+              <img src={logo} alt="Atlantic Creators Logo" className="h-10 w-10 object-contain" />
+              <span className="font-logo text-2xl tracking-wide text-foreground">
+                Atlantic Creators
               </span>
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed mb-6 max-w-sm">
@@ -50,7 +52,7 @@ export const Footer = () => {
                   key={social.label}
                   href={social.href}
                   aria-label={social.label}
-                  className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+                  className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all duration-300"
                 >
                   <social.icon size={18} />
                 </a>
@@ -66,7 +68,7 @@ export const Footer = () => {
                 <li key={link.path}>
                   <Link
                     to={link.path}
-                    className="text-muted-foreground hover:text-primary text-sm transition-colors duration-300"
+                    className="text-muted-foreground hover:text-secondary text-sm transition-colors duration-300"
                   >
                     {link.name}
                   </Link>
@@ -82,7 +84,7 @@ export const Footer = () => {
                 <li key={link.path}>
                   <Link
                     to={link.path}
-                    className="text-muted-foreground hover:text-primary text-sm transition-colors duration-300"
+                    className="text-muted-foreground hover:text-secondary text-sm transition-colors duration-300"
                   >
                     {link.name}
                   </Link>
@@ -98,7 +100,7 @@ export const Footer = () => {
                 <li key={link.path}>
                   <Link
                     to={link.path}
-                    className="text-muted-foreground hover:text-primary text-sm transition-colors duration-300"
+                    className="text-muted-foreground hover:text-secondary text-sm transition-colors duration-300"
                   >
                     {link.name}
                   </Link>
@@ -112,11 +114,11 @@ export const Footer = () => {
         <div className="mt-12 pt-8 border-t border-border">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
-              <a href="mailto:hello@atlanticcreators.com" className="flex items-center gap-2 hover:text-primary transition-colors">
+              <a href="mailto:hello@atlanticcreators.com" className="flex items-center gap-2 hover:text-secondary transition-colors">
                 <Mail size={16} />
                 hello@atlanticcreators.com
               </a>
-              <a href="tel:+1234567890" className="flex items-center gap-2 hover:text-primary transition-colors">
+              <a href="tel:+1234567890" className="flex items-center gap-2 hover:text-secondary transition-colors">
                 <Phone size={16} />
                 +1 (234) 567-890
               </a>
@@ -134,8 +136,8 @@ export const Footer = () => {
             © {new Date().getFullYear()} Atlantic Creators Company. All rights reserved.
           </p>
           <div className="flex items-center gap-6 text-sm text-muted-foreground">
-            <Link to="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-primary transition-colors">Terms of Service</Link>
+            <Link to="/privacy" className="hover:text-secondary transition-colors">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-secondary transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>

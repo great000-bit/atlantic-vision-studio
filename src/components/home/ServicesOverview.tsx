@@ -54,7 +54,7 @@ export const ServicesOverview = () => {
   return (
     <section className="section-padding bg-background relative overflow-hidden">
       {/* Background Accent */}
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-charcoal/50 to-transparent pointer-events-none" />
+      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-muted/50 to-transparent pointer-events-none" />
       
       <div className="container mx-auto px-6 lg:px-8 relative z-10">
         <SectionHeading

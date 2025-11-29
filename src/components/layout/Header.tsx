@@ -1,23 +1,34 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import logo from "@/assets/logo.png";
 
 const navLinks = [
   { name: "Home", path: "/" },
   { name: "About", path: "/about" },
   { name: "Services", path: "/services" },
   { name: "Portfolio", path: "/portfolio" },
-  { name: "Creators", path: "/creators" },
+  { 
+    name: "Creators", 
+    path: "/creators",
+    dropdown: [
+      { name: "Join Collective", path: "/creators" },
+      { name: "Artist Portal", path: "/portal" },
+    ]
+  },
   { name: "Studios", path: "/studios" },
   { name: "Events", path: "/events" },
+  { name: "Blog", path: "/blog" },
   { name: "Contact", path: "/contact" },
 ];
 
 export const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const location = useLocation();
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,7 +40,18 @@ export const Header = () => {
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
+    setOpenDropdown(null);
   }, [location]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setOpenDropdown(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <header
@@ -42,27 +64,72 @@ export const Header = () => {
       <div className="container mx-auto px-6 lg:px-8">
         <nav className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <span className="font-heading text-xl md:text-2xl font-bold tracking-tight">
-              <span className="text-foreground">ATLANTIC</span>
-              <span className="text-primary ml-2">CREATORS</span>
+          <Link to="/" className="flex items-center gap-3">
+            <img src={logo} alt="Atlantic Creators Logo" className="h-10 w-10 object-contain" />
+            <span className="font-logo text-xl md:text-2xl tracking-wide text-foreground">
+              Atlantic Creators
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-8">
+          <div className="hidden lg:flex items-center space-x-6" ref={dropdownRef}>
             {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`font-body text-sm tracking-wide transition-colors duration-300 link-underline ${
-                  location.pathname === link.path
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {link.name}
-              </Link>
+              <div key={link.path} className="relative">
+                {link.dropdown ? (
+                  <>
+                    <button
+                      onClick={() => setOpenDropdown(openDropdown === link.name ? null : link.name)}
+                      className={`flex items-center gap-1 font-body text-sm tracking-wide transition-colors duration-300 ${
+                        location.pathname === link.path || location.pathname === "/portal"
+                          ? "text-primary"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {link.name}
+                      <ChevronDown 
+                        size={14} 
+                        className={`transition-transform duration-200 ${openDropdown === link.name ? 'rotate-180' : ''}`} 
+                      />
+                    </button>
+                    <AnimatePresence>
+                      {openDropdown === link.name && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 10 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute top-full left-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-xl overflow-hidden z-50"
+                        >
+                          {link.dropdown.map((item) => (
+                            <Link
+                              key={item.path}
+                              to={item.path}
+                              className={`block px-4 py-3 text-sm transition-colors ${
+                                location.pathname === item.path
+                                  ? "bg-primary/10 text-primary"
+                                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                              }`}
+                            >
+                              {item.name}
+                            </Link>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </>
+                ) : (
+                  <Link
+                    to={link.path}
+                    className={`font-body text-sm tracking-wide transition-colors duration-300 link-underline ${
+                      location.pathname === link.path
+                        ? "text-primary"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                )}
+              </div>
             ))}
           </div>
 
@@ -98,7 +165,7 @@ export const Header = () => {
             className="lg:hidden bg-background border-t border-border"
           >
             <div className="container mx-auto px-6 py-8">
-              <div className="flex flex-col space-y-4">
+              <div className="flex flex-col space-y-2">
                 {navLinks.map((link, index) => (
                   <motion.div
                     key={link.path}
@@ -106,16 +173,59 @@ export const Header = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
                   >
-                    <Link
-                      to={link.path}
-                      className={`block py-2 font-body text-lg transition-colors ${
-                        location.pathname === link.path
-                          ? "text-primary"
-                          : "text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      {link.name}
-                    </Link>
+                    {link.dropdown ? (
+                      <div>
+                        <button
+                          onClick={() => setOpenDropdown(openDropdown === link.name ? null : link.name)}
+                          className={`w-full flex items-center justify-between py-2 font-body text-lg transition-colors ${
+                            location.pathname === link.path
+                              ? "text-primary"
+                              : "text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          {link.name}
+                          <ChevronDown 
+                            size={18} 
+                            className={`transition-transform duration-200 ${openDropdown === link.name ? 'rotate-180' : ''}`} 
+                          />
+                        </button>
+                        <AnimatePresence>
+                          {openDropdown === link.name && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="pl-4 border-l border-border ml-2"
+                            >
+                              {link.dropdown.map((item) => (
+                                <Link
+                                  key={item.path}
+                                  to={item.path}
+                                  className={`block py-2 font-body text-base transition-colors ${
+                                    location.pathname === item.path
+                                      ? "text-primary"
+                                      : "text-muted-foreground hover:text-foreground"
+                                  }`}
+                                >
+                                  {item.name}
+                                </Link>
+                              ))}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    ) : (
+                      <Link
+                        to={link.path}
+                        className={`block py-2 font-body text-lg transition-colors ${
+                          location.pathname === link.path
+                            ? "text-primary"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {link.name}
+                      </Link>
+                    )}
                   </motion.div>
                 ))}
                 <motion.div
