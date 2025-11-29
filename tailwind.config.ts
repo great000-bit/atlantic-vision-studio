@@ -57,21 +57,24 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        // Custom Atlantic Creators Colors
-        gold: {
-          DEFAULT: "hsl(var(--gold))",
-          light: "hsl(var(--gold-light))",
-          dark: "hsl(var(--gold-dark))",
+        // Atlantic Creators Brand Colors
+        navy: {
+          DEFAULT: "hsl(var(--navy))",
+          light: "hsl(var(--navy-light))",
         },
-        silver: "hsl(var(--silver))",
-        charcoal: {
-          DEFAULT: "hsl(var(--charcoal))",
-          light: "hsl(var(--charcoal-light))",
+        "red-orange": {
+          DEFAULT: "hsl(var(--red-orange))",
+          dark: "hsl(var(--red-orange-dark))",
+        },
+        aqua: {
+          DEFAULT: "hsl(var(--aqua))",
+          light: "hsl(var(--aqua-light))",
         },
       },
       fontFamily: {
         heading: ['Montserrat', 'sans-serif'],
         body: ['Inter', 'sans-serif'],
+        logo: ['Agile', 'sans-serif'],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -123,14 +126,16 @@ export default {
         shimmer: "shimmer 2s linear infinite",
       },
       backgroundImage: {
-        "gradient-gold": "linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(var(--gold-light)) 100%)",
-        "gradient-dark": "linear-gradient(180deg, hsl(0 0% 5%) 0%, hsl(0 0% 2%) 100%)",
+        "gradient-primary": "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--red-orange-dark)) 100%)",
+        "gradient-accent": "linear-gradient(135deg, hsl(var(--accent)) 0%, hsl(var(--aqua-light)) 100%)",
+        "gradient-dark": "linear-gradient(180deg, hsl(var(--navy-light)) 0%, hsl(var(--navy)) 100%)",
         "gradient-radial": "radial-gradient(ellipse at center, var(--tw-gradient-stops))",
       },
       boxShadow: {
-        glow: "0 0 40px hsl(var(--gold) / 0.15)",
-        "glow-lg": "0 0 60px hsl(var(--gold) / 0.2)",
-        cinematic: "0 25px 50px -12px hsl(0 0% 0% / 0.5)",
+        glow: "0 0 40px hsl(var(--primary) / 0.2)",
+        "glow-accent": "0 0 40px hsl(var(--accent) / 0.2)",
+        "glow-lg": "0 0 60px hsl(var(--primary) / 0.25)",
+        cinematic: "0 25px 50px -12px hsl(var(--navy) / 0.7)",
       },
     },
   },

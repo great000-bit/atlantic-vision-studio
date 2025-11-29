@@ -51,9 +51,9 @@ export const CTASection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="bg-secondary border border-border rounded-2xl p-8 lg:p-10"
+            className="bg-muted border border-border rounded-2xl p-8 lg:p-10"
           >
-            <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center text-primary mb-6">
+            <div className="w-14 h-14 rounded-xl bg-secondary/20 flex items-center justify-center text-secondary mb-6">
               <Users size={28} />
             </div>
             <h3 className="font-heading text-2xl lg:text-3xl font-bold text-foreground mb-4">

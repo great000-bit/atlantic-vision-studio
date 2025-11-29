@@ -2,89 +2,104 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Atlantic Creators Company - Cinematic Design System */
+/* Atlantic Creators Company - Premium Design System */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap');
+
+/* Agile Font for Logo */
+@font-face {
+  font-family: 'Agile';
+  src: url('/fonts/agile.ttf') format('truetype'),
+       url('/fonts/agile.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 
 @layer base {
   :root {
-    /* Cinematic Dark Theme - Primary Palette */
-    --background: 0 0% 2%;
+    /* Atlantic Creators Brand Palette */
+    /* #000d1d - Deep Navy (Primary Background) */
+    --background: 210 100% 6%;
     --foreground: 0 0% 95%;
 
-    --card: 0 0% 5%;
+    /* Card surfaces - slightly lighter navy */
+    --card: 210 80% 8%;
     --card-foreground: 0 0% 95%;
 
-    --popover: 0 0% 5%;
+    --popover: 210 80% 8%;
     --popover-foreground: 0 0% 95%;
 
-    /* Gold Accent - Premium Feel */
-    --primary: 43 45% 59%;
-    --primary-foreground: 0 0% 2%;
+    /* #ed5041 - Bold Red-Orange (Primary Action/CTA) */
+    --primary: 5 82% 59%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Charcoal Secondary */
-    --secondary: 0 0% 10%;
-    --secondary-foreground: 0 0% 90%;
+    /* #4cbac1 - Vibrant Aqua Blue (Accent/Secondary) */
+    --secondary: 183 47% 53%;
+    --secondary-foreground: 210 100% 6%;
 
     /* Muted Tones */
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 60%;
+    --muted: 210 50% 15%;
+    --muted-foreground: 210 20% 60%;
 
-    /* Silver Accent */
-    --accent: 0 0% 75%;
-    --accent-foreground: 0 0% 5%;
+    /* Accent - Aqua */
+    --accent: 183 47% 53%;
+    --accent-foreground: 210 100% 6%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 95%;
 
-    --border: 0 0% 15%;
-    --input: 0 0% 15%;
-    --ring: 43 45% 59%;
+    --border: 210 50% 18%;
+    --input: 210 50% 18%;
+    --ring: 5 82% 59%;
 
     --radius: 0.5rem;
 
     /* Custom Design Tokens */
-    --gold: 43 45% 59%;
-    --gold-light: 43 50% 70%;
-    --gold-dark: 43 40% 45%;
-    --silver: 0 0% 75%;
-    --charcoal: 0 0% 10%;
-    --charcoal-light: 0 0% 15%;
-    --deep-black: 0 0% 2%;
+    --navy: 210 100% 6%;
+    --navy-light: 210 80% 12%;
+    --red-orange: 5 82% 59%;
+    --red-orange-dark: 5 82% 50%;
+    --aqua: 183 47% 53%;
+    --aqua-light: 183 47% 65%;
+    --deep-navy: 210 100% 4%;
     --soft-white: 0 0% 95%;
 
     /* Gradients */
-    --gradient-gold: linear-gradient(135deg, hsl(43 45% 59%) 0%, hsl(43 50% 70%) 100%);
-    --gradient-dark: linear-gradient(180deg, hsl(0 0% 5%) 0%, hsl(0 0% 2%) 100%);
-    --gradient-hero: linear-gradient(180deg, transparent 0%, hsl(0 0% 2% / 0.8) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 8%) 0%, hsl(0 0% 5%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(5 82% 59%) 0%, hsl(5 82% 50%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(183 47% 53%) 0%, hsl(183 47% 45%) 100%);
+    --gradient-dark: linear-gradient(180deg, hsl(210 80% 8%) 0%, hsl(210 100% 6%) 100%);
+    --gradient-hero: linear-gradient(180deg, transparent 0%, hsl(210 100% 6% / 0.9) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(210 80% 10%) 0%, hsl(210 80% 8%) 100%);
 
     /* Typography */
     --font-heading: 'Montserrat', sans-serif;
     --font-body: 'Inter', sans-serif;
+    --font-logo: 'Agile', sans-serif;
 
     /* Shadows */
-    --shadow-subtle: 0 4px 20px hsl(0 0% 0% / 0.3);
-    --shadow-glow: 0 0 40px hsl(43 45% 59% / 0.15);
-    --shadow-card: 0 8px 32px hsl(0 0% 0% / 0.4);
+    --shadow-subtle: 0 4px 20px hsl(210 100% 6% / 0.5);
+    --shadow-glow: 0 0 40px hsl(5 82% 59% / 0.2);
+    --shadow-glow-accent: 0 0 40px hsl(183 47% 53% / 0.2);
+    --shadow-card: 0 8px 32px hsl(210 100% 6% / 0.6);
 
     /* Animations */
     --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
     /* Sidebar (keeping for compatibility) */
-    --sidebar-background: 0 0% 5%;
+    --sidebar-background: 210 80% 8%;
     --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 43 45% 59%;
-    --sidebar-primary-foreground: 0 0% 2%;
-    --sidebar-accent: 0 0% 10%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 0 0% 15%;
-    --sidebar-ring: 43 45% 59%;
+    --sidebar-primary: 5 82% 59%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 183 47% 53%;
+    --sidebar-accent-foreground: 210 100% 6%;
+    --sidebar-border: 210 50% 18%;
+    --sidebar-ring: 5 82% 59%;
   }
 
-  /* Light mode override (disabled - always dark for cinematic feel) */
+  /* Light mode override (disabled - always dark for premium feel) */
   .light {
-    --background: 0 0% 2%;
+    --background: 210 100% 6%;
     --foreground: 0 0% 95%;
   }
 }
@@ -115,9 +130,17 @@
     background: var(--gradient-hero);
   }
 
-  /* Gold Text Gradient */
+  /* Primary Text Gradient (Red-Orange) */
   .text-gradient-gold {
-    background: var(--gradient-gold);
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Accent Text Gradient (Aqua) */
+  .text-gradient-accent {
+    background: var(--gradient-accent);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -130,10 +153,10 @@
     @apply rounded-lg shadow-lg;
   }
 
-  /* Button Variants */
+  /* Primary Button (Red-Orange) */
   .btn-gold {
-    background: var(--gradient-gold);
-    @apply text-background font-semibold px-6 py-3 rounded-md transition-all duration-300;
+    background: var(--gradient-primary);
+    @apply text-white font-semibold px-6 py-3 rounded-md transition-all duration-300;
   }
 
   .btn-gold:hover {
@@ -141,12 +164,25 @@
     box-shadow: var(--shadow-glow);
   }
 
+  /* Outline Button (Aqua/Secondary) */
   .btn-outline-gold {
-    @apply border border-primary text-primary bg-transparent px-6 py-3 rounded-md transition-all duration-300;
+    @apply border border-secondary text-secondary bg-transparent px-6 py-3 rounded-md transition-all duration-300;
   }
 
   .btn-outline-gold:hover {
-    @apply bg-primary text-background;
+    @apply bg-secondary text-secondary-foreground;
+    box-shadow: var(--shadow-glow-accent);
+  }
+
+  /* Accent Button */
+  .btn-accent {
+    background: var(--gradient-accent);
+    @apply text-background font-semibold px-6 py-3 rounded-md transition-all duration-300;
+  }
+
+  .btn-accent:hover {
+    @apply opacity-90 scale-[1.02];
+    box-shadow: var(--shadow-glow-accent);
   }
 
   /* Section Styles */
@@ -185,7 +221,12 @@
 
   /* Input Styles */
   .input-cinematic {
-    @apply bg-secondary border-border text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200;
+    @apply bg-muted border-border text-foreground placeholder:text-muted-foreground focus:border-accent focus:ring-1 focus:ring-accent transition-all duration-200;
+  }
+
+  /* Logo Font */
+  .font-logo {
+    font-family: var(--font-logo);
   }
 }
 

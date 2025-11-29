@@ -6,16 +6,17 @@ export const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background with Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-background via-charcoal to-background">
+      <div className="absolute inset-0 bg-gradient-to-br from-background via-card to-background">
         {/* Animated Gradient Orbs */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-primary/5 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-secondary/10 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-primary/5 rounded-full blur-3xl animate-pulse delay-500" />
         
         {/* Grid Pattern Overlay */}
         <div 
           className="absolute inset-0 opacity-[0.02]"
           style={{
-            backgroundImage: `linear-gradient(hsl(var(--primary)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary)) 1px, transparent 1px)`,
+            backgroundImage: `linear-gradient(hsl(var(--secondary)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--secondary)) 1px, transparent 1px)`,
             backgroundSize: '100px 100px'
           }}
         />
@@ -34,7 +35,7 @@ export const HeroSection = () => {
             transition={{ duration: 0.6 }}
             className="mb-6"
           >
-            <span className="inline-flex items-center gap-2 text-primary text-sm font-medium tracking-[0.2em] uppercase border border-primary/30 px-4 py-2 rounded-full">
+            <span className="inline-flex items-center gap-2 text-secondary text-sm font-medium tracking-[0.2em] uppercase border border-secondary/30 px-4 py-2 rounded-full">
               <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
               Full-Service Media Production
             </span>
@@ -88,7 +89,7 @@ export const HeroSection = () => {
             </Link>
             <Link
               to="/creators"
-              className="text-muted-foreground hover:text-primary transition-colors text-sm uppercase tracking-wider py-3"
+              className="text-muted-foreground hover:text-secondary transition-colors text-sm uppercase tracking-wider py-3"
             >
               Join Our Collective →
             </Link>
@@ -127,7 +128,7 @@ export const HeroSection = () => {
       >
         <div className="flex flex-col items-center gap-2">
           <span className="text-muted-foreground text-xs uppercase tracking-wider">Scroll</span>
-          <div className="w-px h-12 bg-gradient-to-b from-primary to-transparent" />
+          <div className="w-px h-12 bg-gradient-to-b from-secondary to-transparent" />
         </div>
       </motion.div>
     </section>
