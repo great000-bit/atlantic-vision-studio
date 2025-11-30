@@ -66,10 +66,6 @@ export default {
           DEFAULT: "hsl(var(--red-orange))",
           dark: "hsl(var(--red-orange-dark))",
         },
-        aqua: {
-          DEFAULT: "hsl(var(--aqua))",
-          light: "hsl(var(--aqua-light))",
-        },
       },
       fontFamily: {
         heading: ['Montserrat', 'sans-serif'],
@@ -127,13 +123,12 @@ export default {
       },
       backgroundImage: {
         "gradient-primary": "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--red-orange-dark)) 100%)",
-        "gradient-accent": "linear-gradient(135deg, hsl(var(--accent)) 0%, hsl(var(--aqua-light)) 100%)",
+        "gradient-accent": "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--red-orange-dark)) 100%)",
         "gradient-dark": "linear-gradient(180deg, hsl(var(--navy-light)) 0%, hsl(var(--navy)) 100%)",
         "gradient-radial": "radial-gradient(ellipse at center, var(--tw-gradient-stops))",
       },
       boxShadow: {
         glow: "0 0 40px hsl(var(--primary) / 0.2)",
-        "glow-accent": "0 0 40px hsl(var(--accent) / 0.2)",
         "glow-lg": "0 0 60px hsl(var(--primary) / 0.25)",
         cinematic: "0 25px 50px -12px hsl(var(--navy) / 0.7)",
       },

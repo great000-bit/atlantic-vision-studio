@@ -214,7 +214,7 @@ const Blog = () => {
                     <p className="text-muted-foreground leading-relaxed mb-4">
                       {post.excerpt}
                     </p>
-                    <span className="text-secondary font-medium text-sm inline-flex items-center gap-2 group-hover:gap-3 transition-all">
+                    <span className="text-primary font-medium text-sm inline-flex items-center gap-2 group-hover:gap-3 transition-all">
                       Read More
                       <ArrowRight size={14} />
                     </span>
@@ -269,7 +269,7 @@ const Blog = () => {
                       <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2 mb-4">
                         {post.excerpt}
                       </p>
-                      <span className="text-secondary font-medium text-sm inline-flex items-center gap-2">
+                      <span className="text-primary font-medium text-sm inline-flex items-center gap-2">
                         Read Article
                         <ArrowRight size={14} />
                       </span>
@@ -288,7 +288,7 @@ const Blog = () => {
                   setSelectedCategory("All");
                   setSearchQuery("");
                 }}
-                className="mt-4 text-secondary hover:underline"
+                className="mt-4 text-primary hover:underline"
               >
                 Clear filters
               </button>

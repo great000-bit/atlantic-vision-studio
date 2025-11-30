@@ -200,7 +200,7 @@ const Creators = () => {
               className="bg-card border border-border rounded-2xl p-6"
             >
               <div className="space-y-4">
-                <div className="bg-secondary rounded-xl p-4">
+                <div className="bg-card border border-border rounded-xl p-4">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-muted-foreground text-sm">Current Balance</span>
                     <span className="text-primary text-sm font-medium">Available</span>
@@ -208,15 +208,15 @@ const Creators = () => {
                   <div className="font-heading text-3xl font-bold text-foreground">$4,250.00</div>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
-                  <div className="bg-secondary rounded-lg p-3 text-center">
+                  <div className="bg-card border border-border rounded-lg p-3 text-center">
                     <div className="text-primary text-xl font-bold">12</div>
                     <div className="text-muted-foreground text-xs">Projects</div>
                   </div>
-                  <div className="bg-secondary rounded-lg p-3 text-center">
+                  <div className="bg-card border border-border rounded-lg p-3 text-center">
                     <div className="text-primary text-xl font-bold">3</div>
                     <div className="text-muted-foreground text-xs">Pending</div>
                   </div>
-                  <div className="bg-secondary rounded-lg p-3 text-center">
+                  <div className="bg-card border border-border rounded-lg p-3 text-center">
                     <div className="text-primary text-xl font-bold">$18k</div>
                     <div className="text-muted-foreground text-xs">Total Earned</div>
                   </div>
