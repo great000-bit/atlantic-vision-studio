@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Layout } from "@/components/layout/Layout";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { 
   Lock, 
   Mail, 
@@ -41,6 +41,7 @@ const features = [
 const Portal = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -48,13 +49,53 @@ const Portal = () => {
     name: "",
   });
   const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: isLogin ? "Login Feature Coming Soon" : "Registration Feature Coming Soon",
-      description: "The creator portal is currently under development. Check back soon!",
-    });
+    setIsLoading(true);
+
+    // Validate form
+    if (!formData.email || !formData.password) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    if (!isLogin && formData.password !== formData.confirmPassword) {
+      toast({
+        title: "Password Mismatch",
+        description: "Passwords do not match. Please try again.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // Simulate authentication delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    if (isLogin) {
+      // Login flow - redirect to dashboard
+      toast({
+        title: "Welcome Back!",
+        description: "Successfully signed in to your account.",
+      });
+      navigate("/portal/dashboard");
+    } else {
+      // Sign up flow - show success and switch to login
+      toast({
+        title: "Account Created!",
+        description: "Your account has been created. Please sign in.",
+      });
+      setIsLogin(true);
+      setFormData({ ...formData, password: "", confirmPassword: "" });
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -242,10 +283,20 @@ const Portal = () => {
 
                   <button
                     type="submit"
-                    className="w-full btn-gold flex items-center justify-center gap-2 text-sm uppercase tracking-wider"
+                    disabled={isLoading}
+                    className="w-full btn-gold flex items-center justify-center gap-2 text-sm uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isLogin ? "Sign In" : "Create Account"}
-                    <ArrowRight size={16} />
+                    {isLoading ? (
+                      <span className="flex items-center gap-2">
+                        <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                        {isLogin ? "Signing In..." : "Creating Account..."}
+                      </span>
+                    ) : (
+                      <>
+                        {isLogin ? "Sign In" : "Create Account"}
+                        <ArrowRight size={16} />
+                      </>
+                    )}
                   </button>
                 </form>
 
