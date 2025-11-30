@@ -1,25 +1,21 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Play, ArrowRight } from "lucide-react";
+import heroBg from "@/assets/hero-bg.jpg";
 
 export const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background with Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-background via-card to-background">
-        {/* Animated Gradient Orbs */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-primary/5 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-primary/5 rounded-full blur-3xl animate-pulse delay-500" />
-        
-        {/* Grid Pattern Overlay */}
-        <div 
-          className="absolute inset-0 opacity-[0.02]"
-          style={{
-            backgroundImage: `linear-gradient(hsl(var(--border)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px)`,
-            backgroundSize: '100px 100px'
-          }}
+      {/* Cinematic Background Image */}
+      <div className="absolute inset-0">
+        <img
+          src={heroBg}
+          alt="Cinematic cityscape at sunrise"
+          className="w-full h-full object-cover"
         />
+        {/* Dark Overlay for Text Readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/90" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/50 via-transparent to-background/50" />
       </div>
 
       {/* Grain Texture */}
@@ -35,7 +31,7 @@ export const HeroSection = () => {
             transition={{ duration: 0.6 }}
             className="mb-6"
           >
-            <span className="inline-flex items-center gap-2 text-muted-foreground text-sm font-medium tracking-[0.2em] uppercase border border-border px-4 py-2 rounded-full">
+            <span className="inline-flex items-center gap-2 text-foreground/80 text-sm font-medium tracking-[0.2em] uppercase border border-foreground/20 backdrop-blur-sm px-4 py-2 rounded-full bg-background/30">
               <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
               Full-Service Media Production
             </span>
@@ -48,12 +44,22 @@ export const HeroSection = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-6"
           >
-            <span className="text-foreground">Cinematic Stories.</span>
+            <span className="text-foreground drop-shadow-lg">Cinematic Stories.</span>
             <br />
-            <span className="text-gradient-gold">Impactful Visuals.</span>
+            <span className="text-gradient-gold drop-shadow-lg">Impactful Visuals.</span>
             <br />
-            <span className="text-foreground">Complete Media Solutions.</span>
+            <span className="text-foreground drop-shadow-lg">Complete Media Solutions.</span>
           </motion.h1>
+
+          {/* Brand Tagline */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="text-foreground/70 text-lg md:text-xl font-medium tracking-wide max-w-2xl mx-auto"
+          >
+            Cinematic Media. Unified Creators. National Impact.
+          </motion.p>
 
           {/* CTA Buttons */}
           <motion.div
@@ -72,7 +78,7 @@ export const HeroSection = () => {
             </Link>
             <Link
               to="/contact"
-              className="border border-border text-foreground bg-transparent px-6 py-3 rounded-md transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:border-primary flex items-center gap-2 text-sm uppercase tracking-wider"
+              className="border border-foreground/30 text-foreground bg-background/30 backdrop-blur-sm px-6 py-3 rounded-md transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:border-primary flex items-center gap-2 text-sm uppercase tracking-wider"
             >
               Book a Project
             </Link>
@@ -83,7 +89,7 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
-            className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-border pt-10"
+            className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-foreground/10 pt-10"
           >
             {[
               { value: "150+", label: "Projects Delivered" },
@@ -92,10 +98,10 @@ export const HeroSection = () => {
               { value: "5+", label: "Years Experience" },
             ].map((stat, index) => (
               <div key={stat.label} className="text-center">
-                <div className="font-heading text-3xl md:text-4xl font-bold text-primary mb-2">
+                <div className="font-heading text-3xl md:text-4xl font-bold text-primary mb-2 drop-shadow-lg">
                   {stat.value}
                 </div>
-                <div className="text-muted-foreground text-sm">{stat.label}</div>
+                <div className="text-foreground/60 text-sm">{stat.label}</div>
               </div>
             ))}
           </motion.div>
@@ -110,8 +116,8 @@ export const HeroSection = () => {
         className="absolute bottom-8 left-1/2 -translate-x-1/2"
       >
         <div className="flex flex-col items-center gap-2">
-          <span className="text-muted-foreground text-xs uppercase tracking-wider">Scroll</span>
-          <div className="w-px h-12 bg-gradient-to-b from-border to-transparent" />
+          <span className="text-foreground/50 text-xs uppercase tracking-wider">Scroll</span>
+          <div className="w-px h-12 bg-gradient-to-b from-foreground/30 to-transparent" />
         </div>
       </motion.div>
     </section>
