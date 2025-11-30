@@ -131,7 +131,7 @@ const Portal = () => {
             >
               <div className="bg-card border border-border rounded-2xl p-8 lg:p-10 max-w-md mx-auto">
                 {/* Tab Switcher */}
-                <div className="flex bg-secondary rounded-lg p-1 mb-8">
+                <div className="flex bg-muted rounded-lg p-1 mb-8">
                   <button
                     onClick={() => setIsLogin(true)}
                     className={`flex-1 py-2.5 rounded-md text-sm font-medium transition-all ${

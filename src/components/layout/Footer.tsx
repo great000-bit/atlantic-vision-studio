@@ -66,9 +66,9 @@ export const Footer = () => {
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.path}>
-                  <Link
+                <Link
                     to={link.path}
-                    className="text-muted-foreground hover:text-secondary text-sm transition-colors duration-300"
+                    className="text-muted-foreground hover:text-primary text-sm transition-colors duration-300"
                   >
                     {link.name}
                   </Link>
@@ -82,9 +82,9 @@ export const Footer = () => {
             <ul className="space-y-3">
               {footerLinks.services.map((link) => (
                 <li key={link.path}>
-                  <Link
+                <Link
                     to={link.path}
-                    className="text-muted-foreground hover:text-secondary text-sm transition-colors duration-300"
+                    className="text-muted-foreground hover:text-primary text-sm transition-colors duration-300"
                   >
                     {link.name}
                   </Link>
@@ -98,9 +98,9 @@ export const Footer = () => {
             <ul className="space-y-3">
               {footerLinks.creators.map((link) => (
                 <li key={link.path}>
-                  <Link
+                <Link
                     to={link.path}
-                    className="text-muted-foreground hover:text-secondary text-sm transition-colors duration-300"
+                    className="text-muted-foreground hover:text-primary text-sm transition-colors duration-300"
                   >
                     {link.name}
                   </Link>
@@ -114,11 +114,11 @@ export const Footer = () => {
         <div className="mt-12 pt-8 border-t border-border">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
-              <a href="mailto:hello@atlanticcreators.com" className="flex items-center gap-2 hover:text-secondary transition-colors">
+              <a href="mailto:hello@atlanticcreators.com" className="flex items-center gap-2 hover:text-primary transition-colors">
                 <Mail size={16} />
                 hello@atlanticcreators.com
               </a>
-              <a href="tel:+1234567890" className="flex items-center gap-2 hover:text-secondary transition-colors">
+              <a href="tel:+1234567890" className="flex items-center gap-2 hover:text-primary transition-colors">
                 <Phone size={16} />
                 +1 (234) 567-890
               </a>
@@ -136,8 +136,8 @@ export const Footer = () => {
             © {new Date().getFullYear()} Atlantic Creators Company. All rights reserved.
           </p>
           <div className="flex items-center gap-6 text-sm text-muted-foreground">
-            <Link to="/privacy" className="hover:text-secondary transition-colors">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-secondary transition-colors">Terms of Service</Link>
+            <Link to="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-primary transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>

@@ -33,17 +33,17 @@
     --primary: 5 82% 59%;
     --primary-foreground: 0 0% 100%;
 
-    /* #4cbac1 - Vibrant Aqua Blue (Accent/Secondary) */
-    --secondary: 183 47% 53%;
-    --secondary-foreground: 210 100% 6%;
+    /* Secondary - Muted neutral (replacing aqua) */
+    --secondary: 210 50% 18%;
+    --secondary-foreground: 0 0% 95%;
 
     /* Muted Tones */
     --muted: 210 50% 15%;
     --muted-foreground: 210 20% 60%;
 
-    /* Accent - Aqua */
-    --accent: 183 47% 53%;
-    --accent-foreground: 210 100% 6%;
+    /* Accent - Primary based */
+    --accent: 5 82% 59%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 95%;
@@ -59,14 +59,11 @@
     --navy-light: 210 80% 12%;
     --red-orange: 5 82% 59%;
     --red-orange-dark: 5 82% 50%;
-    --aqua: 183 47% 53%;
-    --aqua-light: 183 47% 65%;
     --deep-navy: 210 100% 4%;
     --soft-white: 0 0% 95%;
 
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(5 82% 59%) 0%, hsl(5 82% 50%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(183 47% 53%) 0%, hsl(183 47% 45%) 100%);
     --gradient-dark: linear-gradient(180deg, hsl(210 80% 8%) 0%, hsl(210 100% 6%) 100%);
     --gradient-hero: linear-gradient(180deg, transparent 0%, hsl(210 100% 6% / 0.9) 100%);
     --gradient-card: linear-gradient(180deg, hsl(210 80% 10%) 0%, hsl(210 80% 8%) 100%);
@@ -79,7 +76,6 @@
     /* Shadows */
     --shadow-subtle: 0 4px 20px hsl(210 100% 6% / 0.5);
     --shadow-glow: 0 0 40px hsl(5 82% 59% / 0.2);
-    --shadow-glow-accent: 0 0 40px hsl(183 47% 53% / 0.2);
     --shadow-card: 0 8px 32px hsl(210 100% 6% / 0.6);
 
     /* Animations */
@@ -91,8 +87,8 @@
     --sidebar-foreground: 0 0% 95%;
     --sidebar-primary: 5 82% 59%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 183 47% 53%;
-    --sidebar-accent-foreground: 210 100% 6%;
+    --sidebar-accent: 5 82% 59%;
+    --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 210 50% 18%;
     --sidebar-ring: 5 82% 59%;
   }
@@ -138,9 +134,9 @@
     background-clip: text;
   }
 
-  /* Accent Text Gradient (Aqua) */
+  /* Accent Text Gradient */
   .text-gradient-accent {
-    background: var(--gradient-accent);
+    background: var(--gradient-primary);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -164,25 +160,25 @@
     box-shadow: var(--shadow-glow);
   }
 
-  /* Outline Button (Aqua/Secondary) */
+  /* Outline Button */
   .btn-outline-gold {
-    @apply border border-secondary text-secondary bg-transparent px-6 py-3 rounded-md transition-all duration-300;
+    @apply border border-border text-foreground bg-transparent px-6 py-3 rounded-md transition-all duration-300;
   }
 
   .btn-outline-gold:hover {
-    @apply bg-secondary text-secondary-foreground;
-    box-shadow: var(--shadow-glow-accent);
+    @apply bg-primary text-primary-foreground border-primary;
+    box-shadow: var(--shadow-glow);
   }
 
   /* Accent Button */
   .btn-accent {
-    background: var(--gradient-accent);
-    @apply text-background font-semibold px-6 py-3 rounded-md transition-all duration-300;
+    background: var(--gradient-primary);
+    @apply text-white font-semibold px-6 py-3 rounded-md transition-all duration-300;
   }
 
   .btn-accent:hover {
     @apply opacity-90 scale-[1.02];
-    box-shadow: var(--shadow-glow-accent);
+    box-shadow: var(--shadow-glow);
   }
 
   /* Section Styles */
@@ -221,7 +217,7 @@
 
   /* Input Styles */
   .input-cinematic {
-    @apply bg-muted border-border text-foreground placeholder:text-muted-foreground focus:border-accent focus:ring-1 focus:ring-accent transition-all duration-200;
+    @apply bg-muted border-border text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200;
   }
 
   /* Logo Font */

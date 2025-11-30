@@ -90,7 +90,7 @@ const PortalDashboard = () => {
         return "text-yellow-400 bg-yellow-400/10";
       case "processing":
       case "review":
-        return "text-secondary bg-secondary/10";
+        return "text-blue-400 bg-blue-400/10";
       default:
         return "text-muted-foreground bg-muted";
     }
@@ -197,7 +197,7 @@ const PortalDashboard = () => {
                     </h2>
                     <button
                       onClick={() => setActiveTab("projects")}
-                      className="text-secondary text-sm hover:underline flex items-center gap-1"
+                      className="text-primary text-sm hover:underline flex items-center gap-1"
                     >
                       View All
                       <ChevronRight size={14} />
@@ -233,7 +233,7 @@ const PortalDashboard = () => {
                     </h2>
                     <button
                       onClick={() => setActiveTab("payments")}
-                      className="text-secondary text-sm hover:underline flex items-center gap-1"
+                      className="text-primary text-sm hover:underline flex items-center gap-1"
                     >
                       View All
                       <ChevronRight size={14} />
@@ -393,7 +393,7 @@ const PortalDashboard = () => {
                       {mockInvoices.map((invoice) => (
                         <tr key={invoice.id} className="hover:bg-muted/30 transition-colors">
                           <td className="px-6 py-4">
-                            <p className="font-medium text-secondary text-sm">{invoice.id}</p>
+                            <p className="font-medium text-primary text-sm">{invoice.id}</p>
                           </td>
                           <td className="px-6 py-4 text-foreground text-sm">
                             {invoice.project}
@@ -405,7 +405,7 @@ const PortalDashboard = () => {
                             {invoice.date}
                           </td>
                           <td className="px-6 py-4">
-                            <button className="flex items-center gap-2 text-secondary hover:underline text-sm">
+                            <button className="flex items-center gap-2 text-primary hover:underline text-sm">
                               <Download size={14} />
                               Download
                             </button>

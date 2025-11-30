@@ -82,67 +82,72 @@ const Contact = () => {
       </section>
 
       {/* Contact Section */}
-      <section className="section-padding bg-card">
+      <section className="section-padding bg-background">
         <div className="container mx-auto px-6 lg:px-8">
-          <div className="grid lg:grid-cols-3 gap-12">
+          <div className="grid lg:grid-cols-5 gap-16">
             {/* Contact Info */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="lg:col-span-1"
+              className="lg:col-span-2 space-y-10"
             >
-              <h2 className="font-heading text-2xl font-bold text-foreground mb-6">
-                Contact Information
-              </h2>
-              <div className="space-y-6 mb-10">
+              <div>
+                <h2 className="font-heading text-3xl font-bold text-foreground mb-2">
+                  Let's Connect
+                </h2>
+                <p className="text-muted-foreground">
+                  Reach out directly or fill out the form.
+                </p>
+              </div>
+              
+              <div className="space-y-8">
                 <a
                   href="mailto:hello@atlanticcreators.com"
-                  className="flex items-start gap-4 group"
+                  className="flex items-center gap-5 group"
                 >
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                    <Mail size={20} />
+                  <div className="w-14 h-14 rounded-xl bg-card border border-border flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all duration-300">
+                    <Mail size={22} />
                   </div>
                   <div>
-                    <div className="text-muted-foreground text-sm mb-1">Email Us</div>
-                    <div className="text-foreground group-hover:text-primary transition-colors">
+                    <div className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Email</div>
+                    <div className="text-foreground text-lg font-medium group-hover:text-primary transition-colors">
                       hello@atlanticcreators.com
                     </div>
                   </div>
                 </a>
                 <a
                   href="tel:+1234567890"
-                  className="flex items-start gap-4 group"
+                  className="flex items-center gap-5 group"
                 >
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                    <Phone size={20} />
+                  <div className="w-14 h-14 rounded-xl bg-card border border-border flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all duration-300">
+                    <Phone size={22} />
                   </div>
                   <div>
-                    <div className="text-muted-foreground text-sm mb-1">Call Us</div>
-                    <div className="text-foreground group-hover:text-primary transition-colors">
+                    <div className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Phone</div>
+                    <div className="text-foreground text-lg font-medium group-hover:text-primary transition-colors">
                       +1 (234) 567-890
                     </div>
                   </div>
                 </a>
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                    <MapPin size={20} />
+                <div className="flex items-center gap-5">
+                  <div className="w-14 h-14 rounded-xl bg-card border border-border flex items-center justify-center text-primary">
+                    <MapPin size={22} />
                   </div>
                   <div>
-                    <div className="text-muted-foreground text-sm mb-1">Visit Us</div>
-                    <div className="text-foreground">
-                      123 Media Way<br />
-                      Atlantic City, USA 12345
+                    <div className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Location</div>
+                    <div className="text-foreground text-lg font-medium">
+                      Atlantic City, USA
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Social Links */}
-              <div>
-                <h3 className="text-foreground font-semibold mb-4">Follow Us</h3>
-                <div className="flex gap-3">
+              <div className="pt-6 border-t border-border">
+                <h3 className="text-muted-foreground text-xs uppercase tracking-wider mb-4">Follow Us</h3>
+                <div className="flex gap-4">
                   {[
                     { icon: Instagram, href: "#", label: "Instagram" },
                     { icon: Youtube, href: "#", label: "YouTube" },
@@ -152,7 +157,7 @@ const Contact = () => {
                       key={social.label}
                       href={social.href}
                       aria-label={social.label}
-                      className="w-11 h-11 rounded-lg bg-secondary flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all"
+                      className="w-12 h-12 rounded-xl bg-card border border-border flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300"
                     >
                       <social.icon size={20} />
                     </a>
@@ -167,16 +172,21 @@ const Contact = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="lg:col-span-2"
+              className="lg:col-span-3"
             >
-              <div className="bg-background border border-border rounded-2xl p-8 lg:p-10">
-                <h2 className="font-heading text-2xl font-bold text-foreground mb-6">
-                  Project Inquiry
-                </h2>
+              <div className="bg-card border border-border rounded-2xl p-8 lg:p-12">
+                <div className="mb-8">
+                  <h2 className="font-heading text-2xl font-bold text-foreground mb-2">
+                    Project Inquiry
+                  </h2>
+                  <p className="text-muted-foreground text-sm">
+                    Tell us about your vision and we'll get back to you within 24 hours.
+                  </p>
+                </div>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid sm:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
+                      <label className="block text-xs uppercase tracking-wider font-medium text-muted-foreground mb-3">
                         Full Name *
                       </label>
                       <input
@@ -184,19 +194,19 @@ const Contact = () => {
                         required
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-4 py-3 bg-card border border-border rounded-lg input-cinematic"
+                        className="w-full px-5 py-4 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"
                         placeholder="Your name"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
+                      <label className="block text-xs uppercase tracking-wider font-medium text-muted-foreground mb-3">
                         Company / Organization
                       </label>
                       <input
                         type="text"
                         value={formData.company}
                         onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                        className="w-full px-4 py-3 bg-card border border-border rounded-lg input-cinematic"
+                        className="w-full px-5 py-4 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"
                         placeholder="Your company"
                       />
                     </div>
@@ -204,7 +214,7 @@ const Contact = () => {
 
                   <div className="grid sm:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
+                      <label className="block text-xs uppercase tracking-wider font-medium text-muted-foreground mb-3">
                         Email *
                       </label>
                       <input
@@ -212,19 +222,19 @@ const Contact = () => {
                         required
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-4 py-3 bg-card border border-border rounded-lg input-cinematic"
+                        className="w-full px-5 py-4 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"
                         placeholder="your@email.com"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
+                      <label className="block text-xs uppercase tracking-wider font-medium text-muted-foreground mb-3">
                         Phone
                       </label>
                       <input
                         type="tel"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full px-4 py-3 bg-card border border-border rounded-lg input-cinematic"
+                        className="w-full px-5 py-4 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"
                         placeholder="+1 (234) 567-890"
                       />
                     </div>
@@ -232,14 +242,14 @@ const Contact = () => {
 
                   <div className="grid sm:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
+                      <label className="block text-xs uppercase tracking-wider font-medium text-muted-foreground mb-3">
                         Project Type *
                       </label>
                       <select
                         required
                         value={formData.projectType}
                         onChange={(e) => setFormData({ ...formData, projectType: e.target.value })}
-                        className="w-full px-4 py-3 bg-card border border-border rounded-lg input-cinematic"
+                        className="w-full px-5 py-4 bg-background border border-border rounded-xl text-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"
                       >
                         <option value="">Select project type</option>
                         {projectTypes.map((type) => (
@@ -248,27 +258,27 @@ const Contact = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
+                      <label className="block text-xs uppercase tracking-wider font-medium text-muted-foreground mb-3">
                         Timeline
                       </label>
                       <input
                         type="text"
                         value={formData.timeline}
                         onChange={(e) => setFormData({ ...formData, timeline: e.target.value })}
-                        className="w-full px-4 py-3 bg-card border border-border rounded-lg input-cinematic"
+                        className="w-full px-5 py-4 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"
                         placeholder="e.g., Q1 2025"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <label className="block text-xs uppercase tracking-wider font-medium text-muted-foreground mb-3">
                       Budget Range (Optional)
                     </label>
                     <select
                       value={formData.budget}
                       onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                      className="w-full px-4 py-3 bg-card border border-border rounded-lg input-cinematic"
+                      className="w-full px-5 py-4 bg-background border border-border rounded-xl text-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"
                     >
                       <option value="">Select budget range</option>
                       <option value="under-5k">Under $5,000</option>
@@ -280,7 +290,7 @@ const Contact = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <label className="block text-xs uppercase tracking-wider font-medium text-muted-foreground mb-3">
                       Project Details *
                     </label>
                     <textarea
@@ -288,14 +298,14 @@ const Contact = () => {
                       rows={5}
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="w-full px-4 py-3 bg-card border border-border rounded-lg input-cinematic resize-none"
+                      className="w-full px-5 py-4 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 resize-none"
                       placeholder="Tell us about your project, goals, and any specific requirements..."
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full btn-gold flex items-center justify-center gap-2 text-sm uppercase tracking-wider"
+                    className="w-full btn-gold flex items-center justify-center gap-3 text-sm uppercase tracking-wider py-4"
                   >
                     <Send size={18} />
                     Send Message
@@ -307,17 +317,6 @@ const Contact = () => {
         </div>
       </section>
 
-      {/* Map Section (Placeholder) */}
-      <section className="h-[400px] bg-secondary relative">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center">
-            <MapPin size={48} className="text-primary mx-auto mb-4" />
-            <p className="text-muted-foreground">
-              Interactive map coming soon
-            </p>
-          </div>
-        </div>
-      </section>
     </Layout>
   );
 };
