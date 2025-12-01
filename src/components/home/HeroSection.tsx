@@ -5,13 +5,17 @@ import heroBg from "@/assets/hero-bg.jpg";
 
 export const HeroSection = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section 
+      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      aria-label="Hero section"
+    >
       {/* Cinematic Background Image */}
       <div className="absolute inset-0">
         <img
           src={heroBg}
-          alt="Cinematic cityscape at sunrise"
+          alt="Atlantic Creators - Cinematic cityscape at sunrise representing full-scale media production"
           className="w-full h-full object-cover"
+          loading="eager"
         />
         {/* Dark Overlay for Text Readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/90" />

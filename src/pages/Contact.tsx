@@ -11,6 +11,7 @@ import {
   Linkedin
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { SEO } from "@/components/SEO";
 
 const projectTypes = [
   "Content Creation",
@@ -56,6 +57,12 @@ const Contact = () => {
 
   return (
     <Layout>
+      <SEO 
+        title="Contact Us"
+        description="Get in touch with Atlantic Creators Company. Tell us about your project and we'll bring your vision to life with premium media production."
+        url="https://atlanticcreators.com/contact"
+        keywords="contact Atlantic Creators, media production inquiry, book media production, project consultation"
+      />
       {/* Hero Section */}
       <section className="pt-32 pb-20 bg-background relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal/30 to-transparent pointer-events-none" />

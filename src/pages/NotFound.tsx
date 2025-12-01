@@ -2,10 +2,15 @@ import { Layout } from "@/components/layout/Layout";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Home, ArrowLeft } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 const NotFound = () => {
   return (
     <Layout>
+      <SEO 
+        title="Page Not Found"
+        description="The page you're looking for doesn't exist or has been moved."
+      />
       <section className="min-h-[80vh] flex items-center justify-center bg-background relative overflow-hidden">
         {/* Background Elements */}
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal/30 to-transparent pointer-events-none" />

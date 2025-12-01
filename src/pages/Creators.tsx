@@ -12,6 +12,7 @@ import {
   Send
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { SEO } from "@/components/SEO";
 
 const benefits = [
   {
@@ -96,6 +97,12 @@ const Creators = () => {
 
   return (
     <Layout>
+      <SEO 
+        title="Creators Collective"
+        description="Join Atlantic Creators Collective - a network of professional photographers, videographers, editors, and audio professionals. Access premium projects and transparent payments."
+        url="https://atlanticcreators.com/creators"
+        keywords="join creators collective, freelance videographer, freelance photographer, media production network, creator opportunities"
+      />
       {/* Hero Section */}
       <section className="pt-32 pb-20 bg-background relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal/30 to-transparent pointer-events-none" />

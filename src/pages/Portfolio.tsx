@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Layout } from "@/components/layout/Layout";
 import { Play, ArrowUpRight, X } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 const categories = [
   "All",
@@ -134,6 +135,12 @@ const Portfolio = () => {
 
   return (
     <Layout>
+      <SEO 
+        title="Portfolio"
+        description="Explore our curated portfolio of photography, videography, documentaries, commercials, and event coverage. See our best work for top brands and events."
+        url="https://atlanticcreators.com/portfolio"
+        keywords="media production portfolio, video portfolio, photography portfolio, documentary work, commercial campaigns, event coverage examples"
+      />
       {/* Hero Section */}
       <section className="pt-32 pb-16 bg-background relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal/30 to-transparent pointer-events-none" />

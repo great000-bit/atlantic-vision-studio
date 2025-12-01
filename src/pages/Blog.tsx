@@ -4,6 +4,7 @@ import { Layout } from "@/components/layout/Layout";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Link } from "react-router-dom";
 import { ArrowRight, Calendar, User, Tag, Search, Clock } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 const categories = [
   "All",
@@ -99,6 +100,12 @@ const Blog = () => {
 
   return (
     <Layout>
+      <SEO 
+        title="Blog & Insights"
+        description="Explore stories, tips, and updates from Atlantic Creators. Learn media production techniques, get behind-the-scenes access, and stay updated on industry trends."
+        url="https://atlanticcreators.com/blog"
+        keywords="media production blog, videography tips, photography insights, behind the scenes, creator interviews, production techniques"
+      />
       {/* Hero Section */}
       <section className="pt-32 pb-16 bg-background relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-muted/30 to-transparent pointer-events-none" />
