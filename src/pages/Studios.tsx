@@ -12,6 +12,7 @@ import {
   Headphones,
   Video
 } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 const mediaStudioFeatures = [
   "4K Multi-camera setup",
@@ -34,6 +35,12 @@ const podcastStudioFeatures = [
 const Studios = () => {
   return (
     <Layout>
+      <SEO 
+        title="Studio Spaces"
+        description="Book our state-of-the-art media and podcast studios. Professional equipment, versatile spaces, and expert support for photoshoots, video production, and podcast recording."
+        url="https://atlanticcreators.com/studios"
+        keywords="media studio rental, podcast studio, production studio, studio booking, professional studio space, video production studio"
+      />
       {/* Hero Section */}
       <section className="pt-32 pb-20 bg-background relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal/30 to-transparent pointer-events-none" />

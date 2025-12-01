@@ -3,6 +3,7 @@ import { Layout } from "@/components/layout/Layout";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Link } from "react-router-dom";
 import { ArrowRight, Check, Camera, Video, Plane, Radio, Scissors, Users } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 const eventTypes = [
   {
@@ -79,6 +80,12 @@ const packages = [
 const Events = () => {
   return (
     <Layout>
+      <SEO 
+        title="Festival & Conference Coverage"
+        description="Professional event media coverage for music festivals, corporate conferences, concerts, and private events. Multi-camera videography, aerial shots, and highlight reels."
+        url="https://atlanticcreators.com/events"
+        keywords="event coverage, festival videography, conference media, corporate event photography, live event production, event highlight reels"
+      />
       {/* Hero Section */}
       <section className="pt-32 pb-20 bg-background relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal/30 to-transparent pointer-events-none" />

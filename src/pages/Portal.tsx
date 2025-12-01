@@ -14,6 +14,7 @@ import {
   Clock
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { SEO } from "@/components/SEO";
 
 const features = [
   {
@@ -100,6 +101,11 @@ const Portal = () => {
 
   return (
     <Layout>
+      <SEO 
+        title="Artist Portal"
+        description="Secure creator portal for Atlantic Creators collective members. Track projects, manage payments, and download invoices."
+        url="https://atlanticcreators.com/portal"
+      />
       <section className="pt-32 pb-20 min-h-screen bg-background relative overflow-hidden">
         {/* Background Elements */}
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal/30 to-transparent pointer-events-none" />

@@ -3,6 +3,7 @@ import { Layout } from "@/components/layout/Layout";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Link } from "react-router-dom";
 import { ArrowRight, Camera, Film, FileVideo, Globe, Mic2, Calendar, Check } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 const services = [
   {
@@ -94,6 +95,12 @@ const services = [
 const Services = () => {
   return (
     <Layout>
+      <SEO 
+        title="Our Services"
+        description="Complete media production services including content creation, commercial production, documentary filmmaking, tourism media, podcast studio, and event coverage."
+        url="https://atlanticcreators.com/services"
+        keywords="media production services, video production, photography services, documentary production, podcast studio, event coverage, commercial advertising"
+      />
       {/* Hero Section */}
       <section className="pt-32 pb-20 bg-background relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal/30 to-transparent pointer-events-none" />

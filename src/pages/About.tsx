@@ -3,6 +3,7 @@ import { Layout } from "@/components/layout/Layout";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Link } from "react-router-dom";
 import { ArrowRight, Target, Eye, Heart, Users } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 const teamMembers = [
   {
@@ -53,6 +54,12 @@ const values = [
 const About = () => {
   return (
     <Layout>
+      <SEO 
+        title="About Us"
+        description="Learn about Atlantic Creators Company - a full-service media production collective uniting top-tier creators, premium studio spaces, and streamlined workflows to deliver excellence."
+        url="https://atlanticcreators.com/about"
+        keywords="about Atlantic Creators, media production team, creative collective, production company history"
+      />
       {/* Hero Section */}
       <section className="pt-32 pb-20 bg-background relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal/30 to-transparent pointer-events-none" />

@@ -17,6 +17,7 @@ import {
   DollarSign,
   Briefcase
 } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 // Mock data for demonstration
 const mockUser = {
@@ -98,6 +99,11 @@ const PortalDashboard = () => {
 
   return (
     <Layout>
+      <SEO 
+        title="Dashboard"
+        description="Creator dashboard for Atlantic Creators collective members. View projects, track payments, and manage your account."
+        url="https://atlanticcreators.com/portal/dashboard"
+      />
       <section className="pt-28 pb-20 min-h-screen bg-background">
         <div className="container mx-auto px-6 lg:px-8">
           {/* Header */}

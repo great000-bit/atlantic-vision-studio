@@ -62,7 +62,7 @@ export const Header = () => {
       }`}
     >
       <div className="container mx-auto px-6 lg:px-8">
-        <nav className="flex items-center justify-between h-20">
+        <nav className="flex items-center justify-between h-20" aria-label="Main navigation">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
             <img src={logo} alt="Atlantic Creators Logo" className="h-10 w-10 object-contain" />
