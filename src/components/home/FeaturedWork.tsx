@@ -82,15 +82,6 @@ export const FeaturedWork = () => {
                   {/* Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
                   
-                  {/* Play Icon for Videos */}
-                  {project.isVideo && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center transform scale-0 group-hover:scale-100 transition-transform duration-300">
-                        <Play size={24} className="text-primary-foreground ml-1" />
-                      </div>
-                    </div>
-                  )}
-                  
                   {/* Content */}
                   <div className="absolute bottom-0 left-0 right-0 p-6">
                     <span className="text-primary text-xs font-medium uppercase tracking-wider">
