@@ -1,7 +1,11 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Play, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { SectionHeading } from "../ui/SectionHeading";
+import tourismMediaVideo from "@/assets/tourism-media.mp4";
+import eventCoverageVideo from "@/assets/event-coverage.mp4";
+import documentaryVideo from "@/assets/documentary.mp4";
+import podcastVideo from "@/assets/podcast.mp4";
 
 const featuredProjects = [
   {
@@ -9,6 +13,7 @@ const featuredProjects = [
     title: "Coastal Luxury Resort",
     category: "Tourism Media",
     image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80",
+    video: tourismMediaVideo,
     isVideo: true,
   },
   {
@@ -16,20 +21,23 @@ const featuredProjects = [
     title: "Tech Summit 2024",
     category: "Event Coverage",
     image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80",
-    isVideo: false,
+    video: eventCoverageVideo,
+    isVideo: true,
   },
   {
     id: 3,
     title: "Artisan Coffee Brand",
     category: "Commercial",
     image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=80",
-    isVideo: true,
+    video: null,
+    isVideo: false,
   },
   {
     id: 4,
     title: "Mountain Documentary",
     category: "Documentary",
     image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80",
+    video: documentaryVideo,
     isVideo: true,
   },
   {
@@ -37,6 +45,7 @@ const featuredProjects = [
     title: "Fashion Week Editorial",
     category: "Photography",
     image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
+    video: null,
     isVideo: false,
   },
   {
@@ -44,7 +53,8 @@ const featuredProjects = [
     title: "Podcast Studio Session",
     category: "Podcast",
     image: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&q=80",
-    isVideo: false,
+    video: podcastVideo,
+    isVideo: true,
   },
 ];
 
@@ -73,11 +83,23 @@ export const FeaturedWork = () => {
             >
               <Link to={`/portfolio/${project.id}`} className="block">
                 <div className={`relative ${index === 0 || index === 3 ? "aspect-[3/4]" : "aspect-video"}`}>
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
+                  {project.isVideo && project.video ? (
+                    <video
+                      src={project.video}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      preload="auto"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  )}
                   
                   {/* Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
