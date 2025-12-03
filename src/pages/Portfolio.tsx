@@ -212,15 +212,6 @@ const Portfolio = () => {
                     {/* Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
                     
-                    {/* Play Icon */}
-                    {project.isVideo && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-14 h-14 rounded-full bg-primary/90 flex items-center justify-center transform scale-0 group-hover:scale-100 transition-transform duration-300">
-                          <Play size={20} className="text-primary-foreground ml-1" />
-                        </div>
-                      </div>
-                    )}
-                    
                     {/* Content */}
                     <div className="absolute bottom-0 left-0 right-0 p-5">
                       <span className="text-primary text-xs font-medium uppercase tracking-wider">
@@ -278,13 +269,6 @@ const Portfolio = () => {
                   alt={selectedProject.title}
                   className="w-full h-full object-cover"
                 />
-                {selectedProject.isVideo && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-20 h-20 rounded-full bg-primary/90 flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
-                      <Play size={32} className="text-primary-foreground ml-1" />
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Content */}
