@@ -87,8 +87,8 @@ const Events = () => {
         keywords="event coverage, festival videography, conference media, corporate event photography, live event production, event highlight reels"
       />
       {/* Hero Section */}
-      <section className="pt-32 pb-20 bg-background relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/30 to-transparent pointer-events-none" />
+      <section className="pt-32 pb-20 bg-background relative overflow-hidden" aria-labelledby="events-heading">
+        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/30 to-transparent pointer-events-none" aria-hidden="true" />
         <div className="container mx-auto px-6 lg:px-8 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -99,7 +99,7 @@ const Events = () => {
             <span className="inline-block text-primary text-sm font-medium tracking-[0.2em] uppercase mb-4">
               Event Coverage
             </span>
-            <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
+            <h1 id="events-heading" className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
               Festival & Conference{" "}
               <span className="text-gradient-gold">Coverage</span>
             </h1>

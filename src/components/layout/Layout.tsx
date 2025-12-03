@@ -10,7 +10,13 @@ export const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
-      <main className="flex-1" role="main">
+      <main 
+        id="main-content" 
+        className="flex-1" 
+        role="main"
+        tabIndex={-1}
+        aria-label="Main content"
+      >
         {children}
       </main>
       <Footer />

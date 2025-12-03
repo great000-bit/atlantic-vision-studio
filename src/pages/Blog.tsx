@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Layout } from "@/components/layout/Layout";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Link } from "react-router-dom";
-import { ArrowRight, Calendar, User, Tag, Search, Clock } from "lucide-react";
+import { ArrowRight, Calendar, User, Search, Clock } from "lucide-react";
 import { SEO } from "@/components/SEO";
 
 const categories = [
@@ -107,9 +107,9 @@ const Blog = () => {
         keywords="media production blog, videography tips, photography insights, behind the scenes, creator interviews, production techniques"
       />
       {/* Hero Section */}
-      <section className="pt-32 pb-16 bg-background relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-muted/30 to-transparent pointer-events-none" />
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+      <section className="pt-32 pb-16 bg-background relative overflow-hidden" aria-labelledby="blog-heading">
+        <div className="absolute inset-0 bg-gradient-to-b from-muted/30 to-transparent pointer-events-none" aria-hidden="true" />
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" aria-hidden="true" />
         
         <div className="container mx-auto px-6 lg:px-8 relative z-10">
           <motion.div
@@ -121,7 +121,7 @@ const Blog = () => {
             <span className="inline-block text-primary text-sm font-medium tracking-[0.2em] uppercase mb-4">
               Blog & Insights
             </span>
-            <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
+            <h1 id="blog-heading" className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
               Insights from{" "}
               <span className="text-gradient-gold">Behind the Lens</span>
             </h1>
@@ -134,23 +134,26 @@ const Blog = () => {
       </section>
 
       {/* Search & Filter */}
-      <section className="py-8 bg-card border-y border-border">
+      <section className="py-8 bg-card border-y border-border" aria-label="Search and filter articles">
         <div className="container mx-auto px-6 lg:px-8">
           <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
             {/* Search */}
             <div className="relative w-full md:w-80">
+              <label htmlFor="blog-search" className="sr-only">Search articles</label>
               <input
-                type="text"
+                type="search"
+                id="blog-search"
                 placeholder="Search articles..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full px-4 py-3 pl-11 bg-background border border-border rounded-lg input-cinematic"
+                aria-describedby="search-results-count"
               />
-              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
             </div>
 
             {/* Category Filter */}
-            <div className="flex flex-wrap gap-2 justify-center">
+            <nav className="flex flex-wrap gap-2 justify-center" aria-label="Filter by category">
               {categories.map((category) => (
                 <button
                   key={category}
@@ -160,18 +163,22 @@ const Blog = () => {
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted text-muted-foreground hover:text-foreground"
                   }`}
+                  aria-pressed={selectedCategory === category}
                 >
                   {category}
                 </button>
               ))}
-            </div>
+            </nav>
           </div>
+          <p id="search-results-count" className="sr-only" aria-live="polite">
+            {filteredPosts.length} articles found
+          </p>
         </div>
       </section>
 
       {/* Featured Posts */}
       {featuredPosts.length > 0 && (
-        <section className="section-padding bg-background">
+        <section className="section-padding bg-background" aria-labelledby="featured-heading">
           <div className="container mx-auto px-6 lg:px-8">
             <SectionHeading
               label="Featured"
@@ -193,25 +200,30 @@ const Blog = () => {
                     <div className="relative aspect-[16/10] rounded-2xl overflow-hidden mb-6">
                       <img
                         src={post.image}
-                        alt={post.title}
+                        alt=""
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        loading="eager"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" aria-hidden="true" />
                       <span className="absolute top-4 left-4 bg-primary text-primary-foreground text-xs px-3 py-1 rounded-full">
                         {post.category}
                       </span>
                     </div>
                     <div className="flex items-center gap-4 text-muted-foreground text-sm mb-3">
                       <span className="flex items-center gap-1">
-                        <User size={14} />
+                        <User size={14} aria-hidden="true" />
+                        <span className="sr-only">Author:</span>
                         {post.author}
                       </span>
                       <span className="flex items-center gap-1">
-                        <Calendar size={14} />
-                        {post.date}
+                        <Calendar size={14} aria-hidden="true" />
+                        <time dateTime="2024-11-28">
+                          <span className="sr-only">Published:</span>
+                          {post.date}
+                        </time>
                       </span>
                       <span className="flex items-center gap-1">
-                        <Clock size={14} />
+                        <Clock size={14} aria-hidden="true" />
                         {post.readTime}
                       </span>
                     </div>
@@ -223,7 +235,7 @@ const Blog = () => {
                     </p>
                     <span className="text-primary font-medium text-sm inline-flex items-center gap-2 group-hover:gap-3 transition-all">
                       Read More
-                      <ArrowRight size={14} />
+                      <ArrowRight size={14} aria-hidden="true" />
                     </span>
                   </Link>
                 </motion.article>
@@ -234,7 +246,7 @@ const Blog = () => {
       )}
 
       {/* All Posts Grid */}
-      <section className="section-padding bg-card">
+      <section className="section-padding bg-card" aria-labelledby="all-articles-heading">
         <div className="container mx-auto px-6 lg:px-8">
           <SectionHeading
             label="All Articles"
@@ -257,8 +269,9 @@ const Blog = () => {
                     <div className="relative aspect-[16/10] overflow-hidden">
                       <img
                         src={post.image}
-                        alt={post.title}
+                        alt=""
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        loading="lazy"
                       />
                       <span className="absolute top-4 left-4 bg-background/90 backdrop-blur-sm text-foreground text-xs px-3 py-1 rounded-full">
                         {post.category}
@@ -266,8 +279,8 @@ const Blog = () => {
                     </div>
                     <div className="p-6">
                       <div className="flex items-center gap-3 text-muted-foreground text-xs mb-3">
-                        <span>{post.date}</span>
-                        <span>·</span>
+                        <time dateTime="2024-11-20">{post.date}</time>
+                        <span aria-hidden="true">·</span>
                         <span>{post.readTime}</span>
                       </div>
                       <h3 className="font-heading text-lg font-bold text-foreground mb-3 group-hover:text-primary transition-colors line-clamp-2">
@@ -278,7 +291,7 @@ const Blog = () => {
                       </p>
                       <span className="text-primary font-medium text-sm inline-flex items-center gap-2">
                         Read Article
-                        <ArrowRight size={14} />
+                        <ArrowRight size={14} aria-hidden="true" />
                       </span>
                     </div>
                   </Link>
@@ -286,7 +299,7 @@ const Blog = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16">
+            <div className="text-center py-16" role="status">
               <p className="text-muted-foreground text-lg">
                 No articles found matching your criteria.
               </p>
@@ -314,7 +327,7 @@ const Blog = () => {
       </section>
 
       {/* Newsletter CTA */}
-      <section className="section-padding bg-background">
+      <section className="section-padding bg-background" aria-labelledby="newsletter-heading">
         <div className="container mx-auto px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -322,16 +335,21 @@ const Blog = () => {
             viewport={{ once: true }}
             className="max-w-2xl mx-auto text-center bg-card border border-border rounded-2xl p-10"
           >
-            <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-4">
+            <h2 id="newsletter-heading" className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-4">
               Stay Updated
             </h2>
             <p className="text-muted-foreground mb-8">
               Subscribe to our newsletter for the latest insights, tips, and behind-the-scenes content.
             </p>
-            <form className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+            <form className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto" aria-label="Newsletter subscription">
+              <label htmlFor="newsletter-email" className="sr-only">Email address</label>
               <input
                 type="email"
+                id="newsletter-email"
+                name="email"
                 placeholder="your@email.com"
+                autoComplete="email"
+                required
                 className="flex-1 px-4 py-3 bg-background border border-border rounded-lg input-cinematic"
               />
               <button type="submit" className="btn-gold text-sm uppercase tracking-wider whitespace-nowrap">

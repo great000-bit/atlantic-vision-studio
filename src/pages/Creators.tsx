@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { SEO } from "@/components/SEO";
+import { creatorFormSchema, sanitizeInput, type CreatorFormData } from "@/lib/validation";
 
 const benefits = [
   {
@@ -77,10 +78,45 @@ const Creators = () => {
     experience: "",
     location: "",
   });
+  const [errors, setErrors] = useState<Partial<Record<keyof CreatorFormData, string>>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setErrors({});
+
+    // Sanitize inputs
+    const sanitizedData = {
+      ...formData,
+      name: sanitizeInput(formData.name),
+      experience: sanitizeInput(formData.experience),
+      location: sanitizeInput(formData.location),
+    };
+
+    // Validate with zod
+    const result = creatorFormSchema.safeParse(sanitizedData);
+    
+    if (!result.success) {
+      const fieldErrors: Partial<Record<keyof CreatorFormData, string>> = {};
+      result.error.errors.forEach((err) => {
+        const field = err.path[0] as keyof CreatorFormData;
+        fieldErrors[field] = err.message;
+      });
+      setErrors(fieldErrors);
+      setIsSubmitting(false);
+      toast({
+        title: "Validation Error",
+        description: "Please check the form for errors.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Simulate form submission
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     toast({
       title: "Application Submitted!",
       description: "Thank you for your interest. We'll be in touch soon.",
@@ -93,6 +129,7 @@ const Creators = () => {
       experience: "",
       location: "",
     });
+    setIsSubmitting(false);
   };
 
   return (
@@ -104,8 +141,8 @@ const Creators = () => {
         keywords="join creators collective, freelance videographer, freelance photographer, media production network, creator opportunities"
       />
       {/* Hero Section */}
-      <section className="pt-32 pb-20 bg-background relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/30 to-transparent pointer-events-none" />
+      <section className="pt-32 pb-20 bg-background relative overflow-hidden" aria-labelledby="creators-heading">
+        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/30 to-transparent pointer-events-none" aria-hidden="true" />
         <div className="container mx-auto px-6 lg:px-8 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -116,7 +153,7 @@ const Creators = () => {
             <span className="inline-block text-primary text-sm font-medium tracking-[0.2em] uppercase mb-4">
               Join the Collective
             </span>
-            <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
+            <h1 id="creators-heading" className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
               Creators{" "}
               <span className="text-gradient-gold">Collective</span>
             </h1>
@@ -130,7 +167,7 @@ const Creators = () => {
       </section>
 
       {/* Benefits */}
-      <section className="section-padding bg-card">
+      <section className="section-padding bg-card" aria-labelledby="benefits-heading">
         <div className="container mx-auto px-6 lg:px-8">
           <SectionHeading
             label="Why Join"
@@ -138,17 +175,18 @@ const Creators = () => {
             subtitle="More than just a network — a partnership built on trust, quality, and mutual success."
           />
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8" role="list">
             {benefits.map((benefit, index) => (
-              <motion.div
+              <motion.article
                 key={benefit.title}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="bg-background border border-border rounded-xl p-6 hover:border-primary/50 transition-colors"
+                role="listitem"
               >
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-4">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-4" aria-hidden="true">
                   <benefit.icon size={24} />
                 </div>
                 <h3 className="font-heading text-lg font-semibold text-foreground mb-2">
@@ -157,14 +195,14 @@ const Creators = () => {
                 <p className="text-muted-foreground text-sm leading-relaxed">
                   {benefit.description}
                 </p>
-              </motion.div>
+              </motion.article>
             ))}
           </div>
         </div>
       </section>
 
       {/* Payment Portal Info */}
-      <section className="section-padding bg-background">
+      <section className="section-padding bg-background" aria-labelledby="portal-heading">
         <div className="container mx-auto px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -176,7 +214,7 @@ const Creators = () => {
               <span className="inline-block text-primary text-sm font-medium tracking-[0.2em] uppercase mb-4">
                 Payment Portal
               </span>
-              <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground mb-6">
+              <h2 id="portal-heading" className="font-heading text-3xl md:text-4xl font-bold text-foreground mb-6">
                 Transparent, Reliable Payments
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-6">
@@ -184,7 +222,7 @@ const Creators = () => {
                 projects, view payment status, download invoices, and manage your earnings — 
                 all in one secure dashboard.
               </p>
-              <ul className="space-y-3">
+              <ul className="space-y-3" role="list">
                 {[
                   "Clear project tracking and status updates",
                   "Secure, timely payments within 7-14 days",
@@ -192,7 +230,7 @@ const Creators = () => {
                   "Direct deposit to your preferred account",
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-foreground">
-                    <Check size={18} className="text-primary flex-shrink-0" />
+                    <Check size={18} className="text-primary flex-shrink-0" aria-hidden="true" />
                     {item}
                   </li>
                 ))}
@@ -205,6 +243,7 @@ const Creators = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
               className="bg-card border border-border rounded-2xl p-6"
+              aria-label="Payment portal preview"
             >
               <div className="space-y-4">
                 <div className="bg-card border border-border rounded-xl p-4">
@@ -238,7 +277,7 @@ const Creators = () => {
       </section>
 
       {/* Application Form */}
-      <section className="section-padding bg-card">
+      <section className="section-padding bg-card" aria-labelledby="apply-heading">
         <div className="container mx-auto px-6 lg:px-8">
           <div className="max-w-2xl mx-auto">
             <SectionHeading
@@ -254,102 +293,164 @@ const Creators = () => {
               transition={{ duration: 0.6 }}
               onSubmit={handleSubmit}
               className="space-y-6"
+              noValidate
+              aria-label="Creator application form"
             >
               <div className="grid sm:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Full Name *
+                  <label htmlFor="creator-name" className="block text-sm font-medium text-foreground mb-2">
+                    Full Name <span className="text-primary" aria-label="required">*</span>
                   </label>
                   <input
                     type="text"
+                    id="creator-name"
+                    name="name"
                     required
+                    autoComplete="name"
+                    maxLength={100}
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 bg-background border border-border rounded-lg input-cinematic"
+                    className={`w-full px-4 py-3 bg-background border rounded-lg input-cinematic ${errors.name ? 'border-destructive' : 'border-border'}`}
                     placeholder="Your name"
+                    aria-invalid={!!errors.name}
+                    aria-describedby={errors.name ? "creator-name-error" : undefined}
                   />
+                  {errors.name && (
+                    <p id="creator-name-error" className="text-destructive text-sm mt-1" role="alert">{errors.name}</p>
+                  )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Email *
+                  <label htmlFor="creator-email" className="block text-sm font-medium text-foreground mb-2">
+                    Email <span className="text-primary" aria-label="required">*</span>
                   </label>
                   <input
                     type="email"
+                    id="creator-email"
+                    name="email"
                     required
+                    autoComplete="email"
+                    maxLength={255}
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-3 bg-background border border-border rounded-lg input-cinematic"
+                    className={`w-full px-4 py-3 bg-background border rounded-lg input-cinematic ${errors.email ? 'border-destructive' : 'border-border'}`}
                     placeholder="your@email.com"
+                    aria-invalid={!!errors.email}
+                    aria-describedby={errors.email ? "creator-email-error" : undefined}
                   />
+                  {errors.email && (
+                    <p id="creator-email-error" className="text-destructive text-sm mt-1" role="alert">{errors.email}</p>
+                  )}
                 </div>
               </div>
 
               <div className="grid sm:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Primary Role *
+                  <label htmlFor="creator-role" className="block text-sm font-medium text-foreground mb-2">
+                    Primary Role <span className="text-primary" aria-label="required">*</span>
                   </label>
                   <select
+                    id="creator-role"
+                    name="role"
                     required
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                    className="w-full px-4 py-3 bg-background border border-border rounded-lg input-cinematic"
+                    className={`w-full px-4 py-3 bg-background border rounded-lg input-cinematic ${errors.role ? 'border-destructive' : 'border-border'}`}
+                    aria-invalid={!!errors.role}
+                    aria-describedby={errors.role ? "creator-role-error" : undefined}
                   >
                     <option value="">Select your role</option>
                     {roles.map((role) => (
                       <option key={role} value={role}>{role}</option>
                     ))}
                   </select>
+                  {errors.role && (
+                    <p id="creator-role-error" className="text-destructive text-sm mt-1" role="alert">{errors.role}</p>
+                  )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Location *
+                  <label htmlFor="creator-location" className="block text-sm font-medium text-foreground mb-2">
+                    Location <span className="text-primary" aria-label="required">*</span>
                   </label>
                   <input
                     type="text"
+                    id="creator-location"
+                    name="location"
                     required
+                    autoComplete="address-level2"
+                    maxLength={100}
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    className="w-full px-4 py-3 bg-background border border-border rounded-lg input-cinematic"
+                    className={`w-full px-4 py-3 bg-background border rounded-lg input-cinematic ${errors.location ? 'border-destructive' : 'border-border'}`}
                     placeholder="City, Country"
+                    aria-invalid={!!errors.location}
+                    aria-describedby={errors.location ? "creator-location-error" : undefined}
                   />
+                  {errors.location && (
+                    <p id="creator-location-error" className="text-destructive text-sm mt-1" role="alert">{errors.location}</p>
+                  )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  Portfolio Link *
+                <label htmlFor="creator-portfolio" className="block text-sm font-medium text-foreground mb-2">
+                  Portfolio Link <span className="text-primary" aria-label="required">*</span>
                 </label>
                 <input
                   type="url"
+                  id="creator-portfolio"
+                  name="portfolio"
                   required
                   value={formData.portfolio}
                   onChange={(e) => setFormData({ ...formData, portfolio: e.target.value })}
-                  className="w-full px-4 py-3 bg-background border border-border rounded-lg input-cinematic"
+                  className={`w-full px-4 py-3 bg-background border rounded-lg input-cinematic ${errors.portfolio ? 'border-destructive' : 'border-border'}`}
                   placeholder="https://yourportfolio.com"
+                  aria-invalid={!!errors.portfolio}
+                  aria-describedby={errors.portfolio ? "creator-portfolio-error" : undefined}
                 />
+                {errors.portfolio && (
+                  <p id="creator-portfolio-error" className="text-destructive text-sm mt-1" role="alert">{errors.portfolio}</p>
+                )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  Experience & Background *
+                <label htmlFor="creator-experience" className="block text-sm font-medium text-foreground mb-2">
+                  Experience & Background <span className="text-primary" aria-label="required">*</span>
                 </label>
                 <textarea
+                  id="creator-experience"
+                  name="experience"
                   required
                   rows={4}
+                  maxLength={2000}
                   value={formData.experience}
                   onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-                  className="w-full px-4 py-3 bg-background border border-border rounded-lg input-cinematic resize-none"
+                  className={`w-full px-4 py-3 bg-background border rounded-lg input-cinematic resize-none ${errors.experience ? 'border-destructive' : 'border-border'}`}
                   placeholder="Tell us about your experience, notable projects, and why you'd like to join the collective..."
+                  aria-invalid={!!errors.experience}
+                  aria-describedby={errors.experience ? "creator-experience-error" : undefined}
                 />
+                {errors.experience && (
+                  <p id="creator-experience-error" className="text-destructive text-sm mt-1" role="alert">{errors.experience}</p>
+                )}
               </div>
 
               <button
                 type="submit"
-                className="w-full btn-gold flex items-center justify-center gap-2 text-sm uppercase tracking-wider"
+                disabled={isSubmitting}
+                className="w-full btn-gold flex items-center justify-center gap-2 text-sm uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-busy={isSubmitting}
               >
-                <Send size={18} />
-                Submit Application
+                {isSubmitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" aria-hidden="true" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <Send size={18} aria-hidden="true" />
+                    Submit Application
+                  </>
+                )}
               </button>
             </motion.form>
           </div>
@@ -357,7 +458,7 @@ const Creators = () => {
       </section>
 
       {/* FAQs */}
-      <section className="section-padding bg-background">
+      <section className="section-padding bg-background" aria-labelledby="faq-heading">
         <div className="container mx-auto px-6 lg:px-8">
           <div className="max-w-2xl mx-auto">
             <SectionHeading
@@ -366,7 +467,7 @@ const Creators = () => {
               subtitle="Everything you need to know about joining the collective."
             />
 
-            <div className="space-y-4">
+            <div className="space-y-4" role="list" aria-label="Frequently asked questions">
               {faqs.map((faq, index) => (
                 <motion.div
                   key={index}
@@ -375,10 +476,13 @@ const Creators = () => {
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: index * 0.1 }}
                   className="bg-card border border-border rounded-xl overflow-hidden"
+                  role="listitem"
                 >
                   <button
                     onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
                     className="w-full flex items-center justify-between p-6 text-left"
+                    aria-expanded={expandedFaq === index}
+                    aria-controls={`faq-answer-${index}`}
                   >
                     <span className="font-heading font-semibold text-foreground">
                       {faq.question}
@@ -388,10 +492,12 @@ const Creators = () => {
                       className={`text-primary transition-transform duration-300 ${
                         expandedFaq === index ? "rotate-180" : ""
                       }`}
+                      aria-hidden="true"
                     />
                   </button>
                   {expandedFaq === index && (
                     <motion.div
+                      id={`faq-answer-${index}`}
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
