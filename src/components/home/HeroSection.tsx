@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Play, ArrowRight } from "lucide-react";
-import heroBg from "@/assets/hero-bg.jpg";
+import heroBg from "@/assets/hero-bg.mp4";
 
 export const HeroSection = () => {
   return (
@@ -9,13 +9,15 @@ export const HeroSection = () => {
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
       aria-label="Hero section"
     >
-      {/* Cinematic Background Image */}
+      {/* Cinematic Background Video */}
       <div className="absolute inset-0">
-        <img
+        <video
           src={heroBg}
-          alt="Atlantic Creators - Cinematic cityscape at sunrise representing full-scale media production"
+          autoPlay
+          loop
+          muted
+          playsInline
           className="w-full h-full object-cover"
-          loading="eager"
         />
         {/* Dark Overlay for Text Readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/90" />
