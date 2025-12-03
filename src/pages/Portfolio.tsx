@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Layout } from "@/components/layout/Layout";
-import { Play, ArrowUpRight, X } from "lucide-react";
+import { ArrowUpRight, X } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import tourismMediaVideo from "@/assets/tourism-media.mp4";
+import eventCoverageVideo from "@/assets/event-coverage.mp4";
+import documentaryVideo from "@/assets/documentary.mp4";
+import podcastVideo from "@/assets/podcast.mp4";
 
 const categories = [
   "All",
@@ -21,6 +25,7 @@ const projects = [
     category: "Tourism",
     description: "A cinematic showcase of the Pacific Shores Resort, capturing the essence of luxury coastal living through stunning aerial and ground footage.",
     image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80",
+    video: tourismMediaVideo,
     isVideo: true,
     client: "Pacific Shores Resort",
   },
@@ -30,7 +35,8 @@ const projects = [
     category: "Events",
     description: "Complete media coverage of the annual Tech Summit, including keynote captures, panel discussions, and attendee interviews.",
     image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80",
-    isVideo: false,
+    video: eventCoverageVideo,
+    isVideo: true,
     client: "TechCorp International",
   },
   {
@@ -39,7 +45,8 @@ const projects = [
     category: "Commercial",
     description: "A warm, intimate commercial campaign highlighting the craft and passion behind artisanal coffee production.",
     image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=80",
-    isVideo: true,
+    video: null,
+    isVideo: false,
     client: "Roast & Brew Co.",
   },
   {
@@ -48,6 +55,7 @@ const projects = [
     category: "Documentary",
     description: "A feature-length documentary exploring the lives of mountain communities and their relationship with the changing landscape.",
     image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80",
+    video: documentaryVideo,
     isVideo: true,
     client: "Nature First Foundation",
   },
@@ -57,6 +65,7 @@ const projects = [
     category: "Photography",
     description: "Exclusive backstage and runway photography from Fashion Week, capturing the energy and artistry of haute couture.",
     image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
+    video: null,
     isVideo: false,
     client: "Vogue Magazine",
   },
@@ -66,7 +75,8 @@ const projects = [
     category: "Commercial",
     description: "Multi-camera video podcast production with professional lighting and audio for a leading business podcast.",
     image: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&q=80",
-    isVideo: false,
+    video: podcastVideo,
+    isVideo: true,
     client: "Business Insights Podcast",
   },
   {
@@ -75,6 +85,7 @@ const projects = [
     category: "Tourism",
     description: "A vibrant tourism campaign showcasing tropical island adventures, from snorkeling to sunset cruises.",
     image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80",
+    video: tourismMediaVideo,
     isVideo: true,
     client: "Island Tourism Board",
   },
@@ -84,6 +95,7 @@ const projects = [
     category: "Events",
     description: "Dynamic event coverage for a major tech startup launch, including product demos and investor presentations.",
     image: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&q=80",
+    video: eventCoverageVideo,
     isVideo: true,
     client: "NovaTech Innovations",
   },
@@ -93,6 +105,7 @@ const projects = [
     category: "Photography",
     description: "An intimate portrait series celebrating diverse voices in the creative industry.",
     image: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&q=80",
+    video: null,
     isVideo: false,
     client: "Creative Minds Magazine",
   },
@@ -102,6 +115,7 @@ const projects = [
     category: "Documentary",
     description: "A powerful documentary series on marine conservation efforts and the communities protecting our oceans.",
     image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
+    video: documentaryVideo,
     isVideo: true,
     client: "Ocean Alliance",
   },
@@ -111,7 +125,8 @@ const projects = [
     category: "Commercial",
     description: "A sleek, high-end commercial campaign for a premium automotive brand, showcasing performance and design.",
     image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80",
-    isVideo: true,
+    video: null,
+    isVideo: false,
     client: "Elite Motors",
   },
   {
@@ -120,6 +135,7 @@ const projects = [
     category: "Events",
     description: "Three days of non-stop coverage at the Summer Sounds Music Festival, capturing performances and crowd energy.",
     image: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=800&q=80",
+    video: eventCoverageVideo,
     isVideo: true,
     client: "Summer Sounds Festival",
   },
@@ -203,11 +219,23 @@ const Portfolio = () => {
                   onClick={() => setSelectedProject(project)}
                 >
                   <div className="relative aspect-[4/3] rounded-lg overflow-hidden">
-                    <img
-                      src={project.image}
-                      alt={project.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
+                    {project.isVideo && project.video ? (
+                      <video
+                        src={project.video}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        preload="auto"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    ) : (
+                      <img
+                        src={project.image}
+                        alt={project.title}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    )}
                     
                     {/* Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
@@ -262,13 +290,25 @@ const Portfolio = () => {
                 <X size={20} />
               </button>
 
-              {/* Image */}
+              {/* Media */}
               <div className="aspect-video relative">
-                <img
-                  src={selectedProject.image}
-                  alt={selectedProject.title}
-                  className="w-full h-full object-cover"
-                />
+                {selectedProject.isVideo && selectedProject.video ? (
+                  <video
+                    src={selectedProject.video}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    preload="auto"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <img
+                    src={selectedProject.image}
+                    alt={selectedProject.title}
+                    className="w-full h-full object-cover"
+                  />
+                )}
               </div>
 
               {/* Content */}
