@@ -17,7 +17,19 @@ export const HeroSection = () => {
           loop
           muted
           playsInline
+          preload="auto"
+          disablePictureInPicture
+          disableRemotePlayback
           className="w-full h-full object-cover"
+          style={{
+            willChange: 'transform',
+            transform: 'translateZ(0)',
+          }}
+          onLoadedData={(e) => {
+            e.currentTarget.play().catch(() => {
+              // Fallback if autoplay fails
+            });
+          }}
         />
         {/* Dark Overlay for Text Readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/90" />
@@ -128,4 +140,4 @@ export const HeroSection = () => {
       </motion.div>
     </section>
   );
-};
+};  
