@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Instagram, Youtube, Linkedin, Mail, MapPin, Phone } from "lucide-react";
 import logo from "@/assets/logo.png";
+import { AdminEntryIcon } from "@/components/admin/AdminEntryIcon";
 
 const footerLinks = {
   company: [
@@ -135,9 +136,12 @@ export const Footer = () => {
           <p className="text-muted-foreground text-sm">
             © {new Date().getFullYear()} Atlantic Creators Company. All rights reserved.
           </p>
-          <div className="flex items-center gap-6 text-sm text-muted-foreground">
-            <Link to="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-primary transition-colors">Terms of Service</Link>
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex items-center gap-6 text-sm text-muted-foreground">
+              <Link to="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
+              <Link to="/terms" className="hover:text-primary transition-colors">Terms of Service</Link>
+            </div>
+            <AdminEntryIcon />
           </div>
         </div>
       </div>
