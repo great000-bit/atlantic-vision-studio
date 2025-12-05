@@ -13,6 +13,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { SEO } from "@/components/SEO";
 import { contactFormSchema, sanitizeInput, type ContactFormData } from "@/lib/validation";
+import { AdminEntryIcon } from "@/components/admin/AdminEntryIcon";
 
 const projectTypes = [
   "Content Creation",
@@ -429,6 +430,11 @@ const Contact = () => {
           </div>
         </div>
       </section>
+
+      {/* Hidden Admin Entry - Only visible on Contact page */}
+      <div className="container mx-auto px-6 lg:px-8 pb-4 flex justify-end">
+        <AdminEntryIcon />
+      </div>
 
     </Layout>
   );
