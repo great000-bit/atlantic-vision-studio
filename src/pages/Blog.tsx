@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Layout } from "@/components/layout/Layout";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Link } from "react-router-dom";
-import { ArrowRight, Calendar, User, Search, Clock } from "lucide-react";
+import { ArrowRight, Calendar, User, Search, Clock, Loader2 } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const categories = [
   "All",
@@ -15,88 +17,86 @@ const categories = [
   "Creator Interviews",
 ];
 
-const blogPosts = [
-  {
-    id: 1,
-    title: "5 Cinematic Techniques Every Brand Video Needs",
-    excerpt: "Discover the essential cinematography techniques that transform ordinary brand videos into compelling visual stories that captivate audiences.",
-    image: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=80",
-    category: "Media Tips",
-    author: "Marcus Chen",
-    date: "Nov 28, 2024",
-    readTime: "5 min read",
-    featured: true,
-  },
-  {
-    id: 2,
-    title: "Behind the Scenes: SoundWave Festival 2024",
-    excerpt: "Take an exclusive look at how our team captured three days of incredible performances at one of the year's biggest music festivals.",
-    image: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=800&q=80",
-    category: "Behind the Scenes",
-    author: "Sarah Williams",
-    date: "Nov 25, 2024",
-    readTime: "8 min read",
-    featured: true,
-  },
-  {
-    id: 3,
-    title: "Atlantic Creators Expands to New Studio Space",
-    excerpt: "We're excited to announce our new state-of-the-art studio facility, featuring enhanced podcast rooms and expanded production capabilities.",
-    image: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&q=80",
-    category: "Company News",
-    author: "Atlantic Team",
-    date: "Nov 20, 2024",
-    readTime: "3 min read",
-    featured: false,
-  },
-  {
-    id: 4,
-    title: "Creator Spotlight: Interview with Alex Thompson",
-    excerpt: "Meet Alex Thompson, one of our talented videographers who's been creating stunning content for major brands across the country.",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=800&q=80",
-    category: "Creator Interviews",
-    author: "Editorial Team",
-    date: "Nov 18, 2024",
-    readTime: "6 min read",
-    featured: false,
-  },
-  {
-    id: 5,
-    title: "The Future of Documentary Filmmaking",
-    excerpt: "How emerging technologies and changing viewer habits are reshaping the documentary landscape and what it means for creators.",
-    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=80",
-    category: "Media Tips",
-    author: "James Rodriguez",
-    date: "Nov 15, 2024",
-    readTime: "7 min read",
-    featured: false,
-  },
-  {
-    id: 6,
-    title: "Project Showcase: Ocean Life Documentary",
-    excerpt: "An in-depth look at the production process behind our award-nominated documentary exploring marine ecosystems.",
-    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
-    category: "Projects",
-    author: "Documentary Team",
-    date: "Nov 10, 2024",
-    readTime: "10 min read",
-    featured: false,
-  },
-];
+interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  content: string | null;
+  cover_image: string | null;
+  tags: string[];
+  published_at: string | null;
+  is_published: boolean;
+  created_at: string;
+}
 
 const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+
+  // Fetch blog posts from Supabase
+  useEffect(() => {
+    fetchBlogPosts();
+  }, []);
+
+  const fetchBlogPosts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('is_published', true)
+        .eq('is_deleted', false)
+        .order('published_at', { ascending: false });
+
+      if (error) throw error;
+      setBlogPosts(data || []);
+    } catch (error) {
+      console.error('Error fetching blog posts:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load blog posts.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Format date for display
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return 'No date';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  };
+
+  // Calculate read time based on content length
+  const calculateReadTime = (content: string | null) => {
+    if (!content) return '5 min read';
+    const wordsPerMinute = 200;
+    const wordCount = content.split(/\s+/).length;
+    const minutes = Math.ceil(wordCount / wordsPerMinute);
+    return `${minutes} min read`;
+  };
 
   const filteredPosts = blogPosts.filter((post) => {
-    const matchesCategory = selectedCategory === "All" || post.category === selectedCategory;
+    const matchesCategory = selectedCategory === "All" || 
+      post.tags?.some(tag => tag.toLowerCase() === selectedCategory.toLowerCase());
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+                         post.excerpt?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         post.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesCategory && matchesSearch;
   });
 
-  const featuredPosts = filteredPosts.filter((post) => post.featured);
-  const regularPosts = filteredPosts.filter((post) => !post.featured);
+  // Separate featured posts (latest 2 published posts)
+  const featuredPosts = filteredPosts.slice(0, 2);
+  const regularPosts = filteredPosts.slice(2);
 
   return (
     <Layout>
@@ -176,155 +176,176 @@ const Blog = () => {
         </div>
       </section>
 
-      {/* Featured Posts */}
-      {featuredPosts.length > 0 && (
-        <section className="section-padding bg-background" aria-labelledby="featured-heading">
+      {/* Loading State */}
+      {isLoading ? (
+        <section className="section-padding bg-background">
           <div className="container mx-auto px-6 lg:px-8">
-            <SectionHeading
-              label="Featured"
-              title="Latest Stories"
-              subtitle="Our most recent and impactful articles"
-            />
-
-            <div className="grid md:grid-cols-2 gap-8">
-              {featuredPosts.map((post, index) => (
-                <motion.article
-                  key={post.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="group"
-                >
-                  <Link to={`/blog/${post.id}`} className="block">
-                    <div className="relative aspect-[16/10] rounded-2xl overflow-hidden mb-6">
-                      <img
-                        src={post.image}
-                        alt=""
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        loading="eager"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" aria-hidden="true" />
-                      <span className="absolute top-4 left-4 bg-primary text-primary-foreground text-xs px-3 py-1 rounded-full">
-                        {post.category}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4 text-muted-foreground text-sm mb-3">
-                      <span className="flex items-center gap-1">
-                        <User size={14} aria-hidden="true" />
-                        <span className="sr-only">Author:</span>
-                        {post.author}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Calendar size={14} aria-hidden="true" />
-                        <time dateTime="2024-11-28">
-                          <span className="sr-only">Published:</span>
-                          {post.date}
-                        </time>
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock size={14} aria-hidden="true" />
-                        {post.readTime}
-                      </span>
-                    </div>
-                    <h2 className="font-heading text-2xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
-                      {post.title}
-                    </h2>
-                    <p className="text-muted-foreground leading-relaxed mb-4">
-                      {post.excerpt}
-                    </p>
-                    <span className="text-primary font-medium text-sm inline-flex items-center gap-2 group-hover:gap-3 transition-all">
-                      Read More
-                      <ArrowRight size={14} aria-hidden="true" />
-                    </span>
-                  </Link>
-                </motion.article>
-              ))}
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           </div>
         </section>
+      ) : (
+        <>
+          {/* Featured Posts */}
+          {featuredPosts.length > 0 && (
+            <section className="section-padding bg-background" aria-labelledby="featured-heading">
+              <div className="container mx-auto px-6 lg:px-8">
+                <SectionHeading
+                  label="Featured"
+                  title="Latest Stories"
+                  subtitle="Our most recent and impactful articles"
+                />
+
+                <div className="grid md:grid-cols-2 gap-8">
+                  {featuredPosts.map((post, index) => (
+                    <motion.article
+                      key={post.id}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      className="group"
+                    >
+                      <Link to={`/blog/${post.slug}`} className="block">
+                        <div className="relative aspect-[16/10] rounded-2xl overflow-hidden mb-6">
+                          {post.cover_image ? (
+                            <img
+                              src={post.cover_image}
+                              alt=""
+                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                              loading="eager"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-muted flex items-center justify-center">
+                              <span className="text-muted-foreground">No image</span>
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" aria-hidden="true" />
+                          {post.tags && post.tags.length > 0 && (
+                            <span className="absolute top-4 left-4 bg-primary text-primary-foreground text-xs px-3 py-1 rounded-full">
+                              {post.tags[0]}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-4 text-muted-foreground text-sm mb-3">
+                          <span className="flex items-center gap-1">
+                            <Calendar size={14} aria-hidden="true" />
+                            <time dateTime={post.published_at || post.created_at}>
+                              <span className="sr-only">Published:</span>
+                              {formatDate(post.published_at || post.created_at)}
+                            </time>
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Clock size={14} aria-hidden="true" />
+                            {calculateReadTime(post.content)}
+                          </span>
+                        </div>
+                        <h2 className="font-heading text-2xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
+                          {post.title}
+                        </h2>
+                        <p className="text-muted-foreground leading-relaxed mb-4">
+                          {post.excerpt || 'No excerpt available'}
+                        </p>
+                        <span className="text-primary font-medium text-sm inline-flex items-center gap-2 group-hover:gap-3 transition-all">
+                          Read More
+                          <ArrowRight size={14} aria-hidden="true" />
+                        </span>
+                      </Link>
+                    </motion.article>
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* All Posts Grid */}
+          <section className="section-padding bg-card" aria-labelledby="all-articles-heading">
+            <div className="container mx-auto px-6 lg:px-8">
+              <SectionHeading
+                label="All Articles"
+                title="Explore More"
+                subtitle="Browse our complete collection of insights and stories"
+              />
+
+              {regularPosts.length > 0 ? (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {regularPosts.map((post, index) => (
+                    <motion.article
+                      key={post.id}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      className="group bg-background border border-border rounded-2xl overflow-hidden"
+                    >
+                      <Link to={`/blog/${post.slug}`} className="block">
+                        <div className="relative aspect-[16/10] overflow-hidden">
+                          {post.cover_image ? (
+                            <img
+                              src={post.cover_image}
+                              alt=""
+                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-muted flex items-center justify-center">
+                              <span className="text-muted-foreground text-sm">No image</span>
+                            </div>
+                          )}
+                          {post.tags && post.tags.length > 0 && (
+                            <span className="absolute top-4 left-4 bg-background/90 backdrop-blur-sm text-foreground text-xs px-3 py-1 rounded-full">
+                              {post.tags[0]}
+                            </span>
+                          )}
+                        </div>
+                        <div className="p-6">
+                          <div className="flex items-center gap-3 text-muted-foreground text-xs mb-3">
+                            <time dateTime={post.published_at || post.created_at}>
+                              {formatDate(post.published_at || post.created_at)}
+                            </time>
+                            <span aria-hidden="true">·</span>
+                            <span>{calculateReadTime(post.content)}</span>
+                          </div>
+                          <h3 className="font-heading text-lg font-bold text-foreground mb-3 group-hover:text-primary transition-colors line-clamp-2">
+                            {post.title}
+                          </h3>
+                          <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2 mb-4">
+                            {post.excerpt || 'No excerpt available'}
+                          </p>
+                          <span className="text-primary font-medium text-sm inline-flex items-center gap-2">
+                            Read Article
+                            <ArrowRight size={14} aria-hidden="true" />
+                          </span>
+                        </div>
+                      </Link>
+                    </motion.article>
+                  ))}
+                </div>
+              ) : filteredPosts.length === 0 ? (
+                <div className="text-center py-16" role="status">
+                  <p className="text-muted-foreground text-lg">
+                    {blogPosts.length === 0 
+                      ? 'No blog posts yet. Check back soon!' 
+                      : 'No articles found matching your criteria.'}
+                  </p>
+                  {blogPosts.length > 0 && (
+                    <button
+                      onClick={() => {
+                        setSelectedCategory("All");
+                        setSearchQuery("");
+                      }}
+                      className="mt-4 text-primary hover:underline"
+                    >
+                      Clear filters
+                    </button>
+                  )}
+                </div>
+              ) : null}
+            </div>
+          </section>
+        </>
       )}
-
-      {/* All Posts Grid */}
-      <section className="section-padding bg-card" aria-labelledby="all-articles-heading">
-        <div className="container mx-auto px-6 lg:px-8">
-          <SectionHeading
-            label="All Articles"
-            title="Explore More"
-            subtitle="Browse our complete collection of insights and stories"
-          />
-
-          {regularPosts.length > 0 ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {regularPosts.map((post, index) => (
-                <motion.article
-                  key={post.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="group bg-background border border-border rounded-2xl overflow-hidden"
-                >
-                  <Link to={`/blog/${post.id}`} className="block">
-                    <div className="relative aspect-[16/10] overflow-hidden">
-                      <img
-                        src={post.image}
-                        alt=""
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        loading="lazy"
-                      />
-                      <span className="absolute top-4 left-4 bg-background/90 backdrop-blur-sm text-foreground text-xs px-3 py-1 rounded-full">
-                        {post.category}
-                      </span>
-                    </div>
-                    <div className="p-6">
-                      <div className="flex items-center gap-3 text-muted-foreground text-xs mb-3">
-                        <time dateTime="2024-11-20">{post.date}</time>
-                        <span aria-hidden="true">·</span>
-                        <span>{post.readTime}</span>
-                      </div>
-                      <h3 className="font-heading text-lg font-bold text-foreground mb-3 group-hover:text-primary transition-colors line-clamp-2">
-                        {post.title}
-                      </h3>
-                      <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2 mb-4">
-                        {post.excerpt}
-                      </p>
-                      <span className="text-primary font-medium text-sm inline-flex items-center gap-2">
-                        Read Article
-                        <ArrowRight size={14} aria-hidden="true" />
-                      </span>
-                    </div>
-                  </Link>
-                </motion.article>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-16" role="status">
-              <p className="text-muted-foreground text-lg">
-                No articles found matching your criteria.
-              </p>
-              <button
-                onClick={() => {
-                  setSelectedCategory("All");
-                  setSearchQuery("");
-                }}
-                className="mt-4 text-primary hover:underline"
-              >
-                Clear filters
-              </button>
-            </div>
-          )}
-
-          {/* Load More */}
-          {regularPosts.length > 0 && (
-            <div className="text-center mt-12">
-              <button className="btn-outline-gold text-sm uppercase tracking-wider">
-                Load More Articles
-              </button>
-            </div>
-          )}
-        </div>
-      </section>
 
       {/* Newsletter CTA */}
       <section className="section-padding bg-background" aria-labelledby="newsletter-heading">
