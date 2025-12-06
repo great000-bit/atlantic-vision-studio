@@ -19,8 +19,6 @@ const Creators = lazy(() => import("./pages/Creators"));
 const Studios = lazy(() => import("./pages/Studios"));
 const Events = lazy(() => import("./pages/Events"));
 const Contact = lazy(() => import("./pages/Contact"));
-const Portal = lazy(() => import("./pages/Portal"));
-const PortalDashboard = lazy(() => import("./pages/PortalDashboard"));
 const Blog = lazy(() => import("./pages/Blog"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -75,8 +73,6 @@ const App = () => (
                 <Route path="/studios" element={<Studios />} />
                 <Route path="/events" element={<Events />} />
                 <Route path="/contact" element={<Contact />} />
-                <Route path="/portal" element={<Portal />} />
-                <Route path="/portal/dashboard" element={<PortalDashboard />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:id" element={<Blog />} />
                 
