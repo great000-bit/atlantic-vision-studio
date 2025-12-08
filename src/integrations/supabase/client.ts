@@ -1,11 +1,10 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || 'placeholder-key';
+const SUPABASE_URL = "https://dgooccdkdxdrluogrykm.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRnb29jY2RrZHhkcmx1b2dyeWttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjI3NzEsImV4cCI6MjA4MDQzODc3MX0.wVNhr8Qm6q3s8ZBKkpiWq0YbRnHCFEEe0hZeT11pzf8";
 
-// Create client with fallback values - API calls will fail gracefully
-export const supabase: SupabaseClient<Database> = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     storage: typeof window !== 'undefined' ? localStorage : undefined,
     persistSession: true,
