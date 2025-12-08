@@ -50,24 +50,24 @@ export const useSectionContent = (pageSlug: string, sectionName: string) => {
     queryKey: ['section-content', pageSlug, sectionName],
     queryFn: async (): Promise<Section | null> => {
       try {
-        const { data: page } = await supabase
+        const { data: page, error: pageError } = await supabase
           .from('pages')
           .select('id')
           .eq('slug', pageSlug)
           .eq('is_deleted', false)
-          .single();
+          .maybeSingle();
 
-        if (!page) return null;
+        if (pageError || !page) return null;
 
-        const { data: section } = await supabase
+        const { data: section, error: sectionError } = await supabase
           .from('sections')
           .select('*')
           .eq('page_id', page.id)
           .eq('name', sectionName)
           .eq('is_deleted', false)
-          .single();
+          .maybeSingle();
 
-        if (!section) return null;
+        if (sectionError || !section) return null;
 
         return {
           ...section,
@@ -96,14 +96,14 @@ export const usePageSections = (pageSlug: string) => {
     queryKey: ['page-sections', pageSlug],
     queryFn: async (): Promise<Section[]> => {
       try {
-        const { data: page } = await supabase
+        const { data: page, error: pageError } = await supabase
           .from('pages')
           .select('id')
           .eq('slug', pageSlug)
           .eq('is_deleted', false)
-          .single();
+          .maybeSingle();
 
-        if (!page) return [];
+        if (pageError || !page) return [];
 
         const { data: sections } = await supabase
           .from('sections')
