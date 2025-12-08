@@ -77,10 +77,18 @@ export const useSectionContent = (pageSlug: string, sectionName: string) => {
         return null;
       }
     },
-    staleTime: 1000 * 30,
+    staleTime: 5000, // 5 seconds for live updates
     gcTime: 1000 * 60 * 5,
     refetchOnWindowFocus: true,
   });
+};
+
+// Helper to get content value with type safety
+export const getContentValue = <T>(content: SectionContent | undefined | null, key: string, defaultValue: T): T => {
+  if (!content || content[key] === undefined || content[key] === null) {
+    return defaultValue;
+  }
+  return content[key] as T;
 };
 
 export const usePageSections = (pageSlug: string) => {
@@ -112,7 +120,7 @@ export const usePageSections = (pageSlug: string) => {
         return [];
       }
     },
-    staleTime: 1000 * 30,
+    staleTime: 5000, // 5 seconds for live updates
     gcTime: 1000 * 60 * 5,
     refetchOnWindowFocus: true,
   });
