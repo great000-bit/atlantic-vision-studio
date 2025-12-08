@@ -1,6 +1,11 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
+
+// Safe import of supabase
+let supabaseClient: typeof import("@/integrations/supabase/client").supabase | null = null;
+import("@/integrations/supabase/client")
+  .then(mod => { supabaseClient = mod.supabase; })
+  .catch(err => console.error("Failed to load Supabase:", err));
 
 interface AdminAuthContextType {
   isAuthenticated: boolean;
@@ -23,167 +28,99 @@ export const useAdminAuth = () => {
   return context;
 };
 
-interface AdminAuthProviderProps {
-  children: ReactNode;
-}
-
-export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
+export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  // Check if user has admin role
   const checkAdminRole = async (userId: string): Promise<boolean> => {
+    if (!supabaseClient) return false;
     try {
-      const { data, error } = await supabase.rpc('has_role', {
-        _user_id: userId,
-        _role: 'admin'
-      });
-      
-      if (error) {
-        console.error('Error checking admin role:', error);
-        return false;
-      }
-      
-      return data === true;
-    } catch (error) {
-      console.error('Error checking admin role:', error);
-      return false;
-    }
+      const { data, error } = await supabaseClient.rpc('has_role', { _user_id: userId, _role: 'admin' });
+      return !error && data === true;
+    } catch { return false; }
   };
 
   useEffect(() => {
     let mounted = true;
-
     const initAuth = async () => {
-      try {
-        // Set up auth state listener FIRST
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(
-          (event, currentSession) => {
-            if (!mounted) return;
-            setSession(currentSession);
-            setUser(currentSession?.user ?? null);
-            
-            // Defer admin check with setTimeout to avoid deadlock
-            if (currentSession?.user) {
-              setTimeout(() => {
-                if (mounted) {
-                  checkAdminRole(currentSession.user.id).then(result => {
-                    if (mounted) setIsAdmin(result);
-                  });
-                }
-              }, 0);
-            } else {
-              setIsAdmin(false);
-            }
-          }
-        );
+      // Wait for supabase to load
+      let attempts = 0;
+      while (!supabaseClient && attempts < 20) {
+        await new Promise(r => setTimeout(r, 100));
+        attempts++;
+      }
+      
+      if (!supabaseClient) {
+        if (mounted) setIsLoading(false);
+        return;
+      }
 
-        // THEN check for existing session
-        const { data: { session: existingSession } } = await supabase.auth.getSession();
-        
+      try {
+        const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((event, currentSession) => {
+          if (!mounted) return;
+          setSession(currentSession);
+          setUser(currentSession?.user ?? null);
+          if (currentSession?.user) {
+            setTimeout(() => mounted && checkAdminRole(currentSession.user.id).then(r => mounted && setIsAdmin(r)), 0);
+          } else {
+            setIsAdmin(false);
+          }
+        });
+
+        const { data: { session: existingSession } } = await supabaseClient.auth.getSession();
         if (!mounted) return;
-        
         setSession(existingSession);
         setUser(existingSession?.user ?? null);
-        
         if (existingSession?.user) {
           const isAdminUser = await checkAdminRole(existingSession.user.id);
-          if (mounted) {
-            setIsAdmin(isAdminUser);
-            setIsLoading(false);
-          }
-        } else {
-          setIsLoading(false);
+          if (mounted) setIsAdmin(isAdminUser);
         }
-
-        return () => {
-          subscription.unsubscribe();
-        };
-      } catch (error) {
-        console.error('Auth initialization error:', error);
-        if (mounted) {
-          setIsLoading(false);
-        }
+        if (mounted) setIsLoading(false);
+        return () => subscription.unsubscribe();
+      } catch {
+        if (mounted) setIsLoading(false);
       }
     };
-
     initAuth();
-
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, []);
 
-  const signIn = async (email: string, password: string): Promise<{ error: Error | null }> => {
+  const signIn = async (email: string, password: string) => {
+    if (!supabaseClient) return { error: new Error("Service unavailable") };
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        return { error: new Error(error.message) };
-      }
-
-      // Check admin role after successful login
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) return { error: new Error(error.message) };
       if (data.user) {
-        const hasAdminRole = await checkAdminRole(data.user.id);
-        if (!hasAdminRole) {
-          // Sign out if not admin
-          await supabase.auth.signOut();
-          return { error: new Error('You do not have admin access.') };
+        const hasAdmin = await checkAdminRole(data.user.id);
+        if (!hasAdmin) {
+          await supabaseClient.auth.signOut();
+          return { error: new Error("You do not have admin access.") };
         }
         setIsAdmin(true);
       }
-
       return { error: null };
-    } catch (error) {
-      return { error: error as Error };
-    }
+    } catch (e) { return { error: e as Error }; }
   };
 
-  const signUp = async (email: string, password: string): Promise<{ error: Error | null }> => {
+  const signUp = async (email: string, password: string) => {
+    if (!supabaseClient) return { error: new Error("Service unavailable") };
     try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/admin`,
-        },
-      });
-
-      if (error) {
-        return { error: new Error(error.message) };
-      }
-
-      return { error: null };
-    } catch (error) {
-      return { error: error as Error };
-    }
+      const { error } = await supabaseClient.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/admin` } });
+      return { error: error ? new Error(error.message) : null };
+    } catch (e) { return { error: e as Error }; }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    if (supabaseClient) await supabaseClient.auth.signOut();
     setUser(null);
     setSession(null);
     setIsAdmin(false);
   };
 
-  const value: AdminAuthContextType = {
-    isAuthenticated: !!session,
-    isLoading,
-    user,
-    session,
-    isAdmin,
-    signIn,
-    signUp,
-    signOut,
-  };
-
   return (
-    <AdminAuthContext.Provider value={value}>
+    <AdminAuthContext.Provider value={{ isAuthenticated: !!session, isLoading, user, session, isAdmin, signIn, signUp, signOut }}>
       {children}
     </AdminAuthContext.Provider>
   );

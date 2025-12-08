@@ -1,21 +1,17 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App.tsx";
+import App from "./App";
 import "./index.css";
 
-try {
-  const rootElement = document.getElementById("root");
+const rootElement = document.getElementById("root");
 
-  if (!rootElement) {
-    throw new Error("Root element not found");
-  }
-
+if (rootElement) {
   const root = createRoot(rootElement);
   root.render(
     <React.StrictMode>
       <App />
     </React.StrictMode>
   );
-} catch (error) {
-  console.error("App failed to render:", error);
+} else {
+  console.error("Root element not found");
 }
