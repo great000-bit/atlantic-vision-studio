@@ -2,8 +2,31 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Play, ArrowRight } from "lucide-react";
 import heroBg from "@/assets/hero-bg.mp4";
+import { useSectionContent, getContentValue } from "@/hooks/useSectionContent";
+
+// Default content
+const defaultStats = [
+  { value: "150+", label: "Projects Delivered" },
+  { value: "50+", label: "Brand Partners" },
+  { value: "25+", label: "Creator Network" },
+  { value: "5+", label: "Years Experience" }
+];
 
 export const HeroSection = () => {
+  const { data: section } = useSectionContent('home', 'hero');
+  const content = section?.content;
+
+  // Dynamic content with fallbacks
+  const heading = getContentValue(content, 'heading', 'Cinematic Stories.');
+  const headingHighlight = getContentValue(content, 'headingHighlight', 'Impactful Visuals.');
+  const headingLine3 = getContentValue(content, 'headingLine3', 'Complete Media Solutions.');
+  const tagline = getContentValue(content, 'tagline', 'Cinematic Media. Unified Creators. National Impact.');
+  const primaryButtonText = getContentValue(content, 'primaryButtonText', 'Explore Portfolio');
+  const primaryButtonUrl = getContentValue(content, 'primaryButtonUrl', '/portfolio');
+  const secondaryButtonText = getContentValue(content, 'secondaryButtonText', 'Book a Project');
+  const secondaryButtonUrl = getContentValue(content, 'secondaryButtonUrl', '/contact');
+  const stats = getContentValue(content, 'stats', defaultStats) as typeof defaultStats;
+
   return (
     <section 
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
@@ -39,26 +62,26 @@ export const HeroSection = () => {
           </motion.div>
 
           <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-6">
-            <span className="text-foreground drop-shadow-lg">Cinematic Stories.</span><br />
-            <span className="text-gradient-gold drop-shadow-lg">Impactful Visuals.</span><br />
-            <span className="text-foreground drop-shadow-lg">Complete Media Solutions.</span>
+            <span className="text-foreground drop-shadow-lg">{heading}</span><br />
+            <span className="text-gradient-gold drop-shadow-lg">{headingHighlight}</span><br />
+            <span className="text-foreground drop-shadow-lg">{headingLine3}</span>
           </motion.h1>
 
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.15 }} className="text-foreground/70 text-lg md:text-xl font-medium tracking-wide max-w-2xl mx-auto">
-            Cinematic Media. Unified Creators. National Impact.
+            {tagline}
           </motion.p>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
-            <Link to="/portfolio" className="group btn-gold flex items-center gap-2 text-sm uppercase tracking-wider">
-              <Play size={18} />Explore Portfolio<ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+            <Link to={primaryButtonUrl} className="group btn-gold flex items-center gap-2 text-sm uppercase tracking-wider">
+              <Play size={18} />{primaryButtonText}<ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
             </Link>
-            <Link to="/contact" className="border border-foreground/30 text-foreground bg-background/30 backdrop-blur-sm px-6 py-3 rounded-md transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:border-primary flex items-center gap-2 text-sm uppercase tracking-wider">
-              Book a Project
+            <Link to={secondaryButtonUrl} className="border border-foreground/30 text-foreground bg-background/30 backdrop-blur-sm px-6 py-3 rounded-md transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:border-primary flex items-center gap-2 text-sm uppercase tracking-wider">
+              {secondaryButtonText}
             </Link>
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.5 }} className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-foreground/10 pt-10">
-            {[{ value: "150+", label: "Projects Delivered" }, { value: "50+", label: "Brand Partners" }, { value: "25+", label: "Creator Network" }, { value: "5+", label: "Years Experience" }].map((stat) => (
+            {stats.map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="font-heading text-3xl md:text-4xl font-bold text-primary mb-2 drop-shadow-lg">{stat.value}</div>
                 <div className="text-foreground/60 text-sm">{stat.label}</div>

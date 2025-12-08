@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, Loader2, Lock, UserPlus } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
@@ -13,8 +13,7 @@ const AdminLogin = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSetupMode, setIsSetupMode] = useState(false);
-  const { signIn, signUp, user, isAdmin, isLoading } = useAdminAuth();
+  const { signIn, user, isAdmin, isLoading } = useAdminAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -38,30 +37,6 @@ const AdminLogin = () => {
 
     setIsSubmitting(true);
 
-    if (isSetupMode) {
-      // First-time setup - create admin account
-      const { error } = await signUp(email, password);
-
-      if (error) {
-        toast({
-          title: 'Setup Failed',
-          description: error.message || 'Failed to create admin account.',
-          variant: 'destructive',
-        });
-        setIsSubmitting(false);
-        return;
-      }
-
-      toast({
-        title: 'Admin Account Created!',
-        description: 'You can now sign in with your credentials.',
-      });
-      setIsSetupMode(false);
-      setIsSubmitting(false);
-      return;
-    }
-
-    // Regular login
     const { error } = await signIn(email, password);
 
     if (error) {
@@ -78,6 +53,8 @@ const AdminLogin = () => {
       title: 'Welcome!',
       description: 'Successfully logged in to the admin panel.',
     });
+    
+    navigate('/admin');
   };
 
   if (isLoading) {
@@ -103,12 +80,10 @@ const AdminLogin = () => {
               <img src={logo} alt="Atlantic Creators" className="h-10 w-10 object-contain" />
             </div>
             <h1 className="font-heading text-2xl font-bold text-foreground mb-2">
-              {isSetupMode ? 'Admin Setup' : 'Admin Access'}
+              Admin Access
             </h1>
             <p className="text-muted-foreground text-sm">
-              {isSetupMode 
-                ? 'Create your admin account' 
-                : 'Sign in to manage your website content'}
+              Sign in to manage your website content
             </p>
           </div>
 
@@ -142,7 +117,7 @@ const AdminLogin = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className="bg-background pr-10"
-                  autoComplete={isSetupMode ? 'new-password' : 'current-password'}
+                  autoComplete="current-password"
                   disabled={isSubmitting}
                 />
                 <button
@@ -163,12 +138,7 @@ const AdminLogin = () => {
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {isSetupMode ? 'Creating...' : 'Signing in...'}
-                </>
-              ) : isSetupMode ? (
-                <>
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  Create Admin Account
+                  Signing in...
                 </>
               ) : (
                 <>
@@ -178,19 +148,6 @@ const AdminLogin = () => {
               )}
             </Button>
           </form>
-
-          {/* Toggle Setup Mode */}
-          <div className="mt-6 text-center">
-            <button
-              type="button"
-              onClick={() => setIsSetupMode(!isSetupMode)}
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              {isSetupMode 
-                ? 'Already have an account? Sign in' 
-                : 'First time? Create admin account'}
-            </button>
-          </div>
 
           {/* Security Note */}
           <p className="mt-6 text-center text-xs text-muted-foreground">

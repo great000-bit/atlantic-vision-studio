@@ -1,30 +1,15 @@
-// ===================================
-// FILE: src/contexts/AdminAuthContext.tsx
-// FIXED VERSION - Now redirects after login
-// ===================================
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-}
-
-interface LoginResult {
-  success: boolean;
-  message?: string;
-  error?: Error | null;
-}
+import { supabase } from "@/integrations/supabase/client";
+import { User, Session } from "@supabase/supabase-js";
 
 interface AdminAuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   user: User | null;
+  session: Session | null;
   isAdmin: boolean;
-  login: (email: string, password: string) => Promise<LoginResult>;
-  logout: () => void;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -43,126 +28,131 @@ interface AdminAuthProviderProps {
 }
 
 export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  useEffect(() => {
-    const checkAuth = () => {
-      try {
-        const token = localStorage.getItem("admin_token");
-        const userData = localStorage.getItem("admin_user");
-        
-        if (token && userData) {
-          const parsedUser = JSON.parse(userData) as User;
-          setIsAuthenticated(true);
-          setUser(parsedUser);
-        }
-      } catch (error) {
-        console.error("Auth check error:", error);
-        localStorage.removeItem("admin_token");
-        localStorage.removeItem("admin_user");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkAuth();
-  }, []);
-
-  const login = async (email: string, password: string): Promise<LoginResult> => {
+  // Check if user has admin role
+  const checkAdminRole = async (userId: string): Promise<boolean> => {
     try {
-      // ==============================================================
-      // TODO: REPLACE WITH YOUR ACTUAL AUTHENTICATION API
-      // ==============================================================
-      // Example API integration:
-      // const response = await fetch('/api/admin/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ email, password })
-      // });
-      // const data = await response.json();
-      // if (data.success) {
-      //   localStorage.setItem("admin_token", data.token);
-      //   localStorage.setItem("admin_user", JSON.stringify(data.user));
-      //   setIsAuthenticated(true);
-      //   setUser(data.user);
-      //   
-      //   // 🔥 REDIRECT TO ADMIN
-      //   setTimeout(() => {
-      //     window.location.href = "/admin";
-      //   }, 500);
-      //   
-      //   return { success: true, message: "Login successful" };
-      // }
+      const { data, error } = await supabase.rpc('has_role', {
+        _user_id: userId,
+        _role: 'admin'
+      });
       
-      // DEMO AUTHENTICATION (REMOVE IN PRODUCTION)
-      if (email === "admin@example.com" && password === "admin123") {
-        const token = "demo_token_" + Date.now();
-        const userData: User = {
-          id: "1",
-          email: email,
-          name: "Admin User",
-          role: "admin"
-        };
-
-        localStorage.setItem("admin_token", token);
-        localStorage.setItem("admin_user", JSON.stringify(userData));
-        
-        setIsAuthenticated(true);
-        setUser(userData);
-
-        // 🔥 FIX: REDIRECT TO ADMIN AFTER SUCCESSFUL LOGIN
-        setTimeout(() => {
-          window.location.href = "/admin";
-        }, 500);
-
-        return { success: true, message: "Login successful", error: null };
-      } else {
-        return { 
-          success: false, 
-          message: "Invalid email or password",
-          error: new Error("Invalid credentials")
-        };
+      if (error) {
+        console.error('Error checking admin role:', error);
+        return false;
       }
+      
+      return data === true;
     } catch (error) {
-      console.error("Login error:", error);
-      return { 
-        success: false, 
-        message: "An error occurred during login",
-        error: error as Error
-      };
+      console.error('Error checking admin role:', error);
+      return false;
     }
   };
 
-  // Alias for signIn (for compatibility)
+  useEffect(() => {
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        // Defer admin check with setTimeout to avoid deadlock
+        if (session?.user) {
+          setTimeout(() => {
+            checkAdminRole(session.user.id).then(setIsAdmin);
+          }, 0);
+        } else {
+          setIsAdmin(false);
+        }
+      }
+    );
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        checkAdminRole(session.user.id).then((isAdminUser) => {
+          setIsAdmin(isAdminUser);
+          setIsLoading(false);
+        });
+      } else {
+        setIsLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   const signIn = async (email: string, password: string): Promise<{ error: Error | null }> => {
-    const result = await login(email, password);
-    return { error: result.error || (result.success ? null : new Error(result.message)) };
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        return { error: new Error(error.message) };
+      }
+
+      // Check admin role after successful login
+      if (data.user) {
+        const hasAdminRole = await checkAdminRole(data.user.id);
+        if (!hasAdminRole) {
+          // Sign out if not admin
+          await supabase.auth.signOut();
+          return { error: new Error('You do not have admin access.') };
+        }
+        setIsAdmin(true);
+      }
+
+      return { error: null };
+    } catch (error) {
+      return { error: error as Error };
+    }
   };
 
-  const logout = () => {
-    localStorage.removeItem("admin_token");
-    localStorage.removeItem("admin_user");
-    setIsAuthenticated(false);
-    setUser(null);
-    window.location.href = "/admin/login";
+  const signUp = async (email: string, password: string): Promise<{ error: Error | null }> => {
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/admin`,
+        },
+      });
+
+      if (error) {
+        return { error: new Error(error.message) };
+      }
+
+      return { error: null };
+    } catch (error) {
+      return { error: error as Error };
+    }
   };
 
-  // Alias for signOut (for compatibility)
   const signOut = async () => {
-    logout();
+    await supabase.auth.signOut();
+    setUser(null);
+    setSession(null);
+    setIsAdmin(false);
   };
 
   const value: AdminAuthContextType = {
-    isAuthenticated,
+    isAuthenticated: !!session,
     isLoading,
     user,
-    isAdmin: isAuthenticated && user?.role === 'admin',
-    login,
-    logout,
+    session,
+    isAdmin,
     signIn,
-    signOut
+    signUp,
+    signOut,
   };
 
   return (
@@ -171,49 +161,3 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
     </AdminAuthContext.Provider>
   );
 };
-
-
-// ===================================
-// WHAT WAS FIXED
-// ===================================
-/*
-🐛 THE PROBLEM:
-- Login was succeeding and showing toast message
-- But no redirect was happening after login
-- User stayed on the login page
-
-✅ THE FIX:
-Added this after successful login (line 108-110):
-
-setTimeout(() => {
-  window.location.href = "/admin/dashboard";
-}, 500);
-
-The 500ms delay allows:
-- Toast message to show
-- State updates to complete
-- Smooth user experience
-
-
-📝 WHAT TO CHANGE:
-Replace "/admin" with your actual admin home page route if different.
-Your current route structure based on App.tsx:
-- /admin → AdminDashboard (✅ This is correct!)
-- /admin/pages
-- /admin/sections
-- /admin/images
-- /admin/portfolio
-- /admin/blog
-
-
-🧪 TEST CREDENTIALS:
-Email: admin@example.com
-Password: admin123
-
-
-⚠️ IMPORTANT NOTES:
-1. Make sure your route "/admin/dashboard" exists
-2. If you're using React Router, you might want to use navigate() instead
-3. For production, replace demo auth with your real API
-4. The setTimeout gives a better UX before redirect
-*/
