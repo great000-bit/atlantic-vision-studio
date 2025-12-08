@@ -431,10 +431,12 @@ const Contact = () => {
         </div>
       </section>
 
-      {/* Hidden Admin Entry - Only visible on Contact page */}
-      <div className="container mx-auto px-6 lg:px-8 pb-4 flex justify-end">
-        <AdminEntryIcon />
-      </div>
+      {/* Admin Entry Button - Now positioned ABOVE any potential footer/overlays */}
+      <section className="bg-background py-8 relative z-50">
+        <div className="container mx-auto px-6 lg:px-8 flex justify-end">
+          <AdminEntryIcon />
+        </div>
+      </section>
 
     </Layout>
   );
