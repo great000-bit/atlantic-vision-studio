@@ -1,4 +1,3 @@
-import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,8 +8,9 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { SkipToContent } from "@/components/SkipToContent";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 import { ProtectedAdminRoute } from "@/components/admin/ProtectedAdminRoute";
+import { Suspense, lazy } from "react";
 
-// Lazy load pages for code splitting
+// Lazy load pages
 const Index = lazy(() => import("./pages/Index"));
 const About = lazy(() => import("./pages/About"));
 const Services = lazy(() => import("./pages/Services"));
@@ -32,13 +32,8 @@ const AdminPortfolio = lazy(() => import("./pages/admin/AdminPortfolio"));
 const AdminBlog = lazy(() => import("./pages/admin/AdminBlog"));
 const AdminRecycleBin = lazy(() => import("./pages/admin/AdminRecycleBin"));
 
-// Loading fallback component
 const PageLoader = () => (
-  <div 
-    className="min-h-screen bg-background flex items-center justify-center"
-    role="status"
-    aria-label="Loading page"
-  >
+  <div className="min-h-screen bg-background flex items-center justify-center">
     <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
   </div>
 );
@@ -46,8 +41,9 @@ const PageLoader = () => (
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 60 * 1000, // 1 minute
+      staleTime: 60 * 1000,
       refetchOnWindowFocus: false,
+      retry: false,
     },
   },
 });
@@ -76,7 +72,6 @@ const App = () => (
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:id" element={<Blog />} />
                 
-                {/* Admin Routes */}
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
                 <Route path="/admin/pages" element={<ProtectedAdminRoute><AdminPages /></ProtectedAdminRoute>} />
@@ -87,7 +82,6 @@ const App = () => (
                 <Route path="/admin/blog" element={<ProtectedAdminRoute><AdminBlog /></ProtectedAdminRoute>} />
                 <Route path="/admin/recycle-bin" element={<ProtectedAdminRoute><AdminRecycleBin /></ProtectedAdminRoute>} />
                 
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
