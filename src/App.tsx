@@ -32,10 +32,9 @@ const AdminPortfolio = lazy(() => import("./pages/admin/AdminPortfolio"));
 const AdminBlog = lazy(() => import("./pages/admin/AdminBlog"));
 const AdminRecycleBin = lazy(() => import("./pages/admin/AdminRecycleBin"));
 
+// Minimal page loader - only shows briefly during initial load
 const PageLoader = () => (
-  <div className="min-h-screen bg-background flex items-center justify-center">
-    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-  </div>
+  <div className="min-h-screen bg-background" />
 );
 
 const queryClient = new QueryClient({
