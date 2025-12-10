@@ -103,7 +103,7 @@ const Blog = () => {
       <SEO 
         title="Blog & Insights"
         description="Explore stories, tips, and updates from Atlantic Creators. Learn media production techniques, get behind-the-scenes access, and stay updated on industry trends."
-        url="https://atlanticcreators.com/blog"
+        url="https://www.theatlanticcreators.com/blog"
         keywords="media production blog, videography tips, photography insights, behind the scenes, creator interviews, production techniques"
       />
       {/* Hero Section */}

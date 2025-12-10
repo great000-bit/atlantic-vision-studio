@@ -57,7 +57,7 @@ const About = () => {
       <SEO 
         title="About Us"
         description="Learn about Atlantic Creators Company - a full-service media production collective uniting top-tier creators, premium studio spaces, and streamlined workflows to deliver excellence."
-        url="https://atlanticcreators.com/about"
+        url="https://www.theatlanticcreators.com/about"
         keywords="about Atlantic Creators, media production team, creative collective, production company history"
       />
       {/* Hero Section */}

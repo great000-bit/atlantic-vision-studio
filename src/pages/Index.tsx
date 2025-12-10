@@ -12,7 +12,8 @@ const Index = () => {
       <SEO 
         title="Cinematic Media Production"
         description="Atlantic Creators Company - Full-service cinematic media production. Photography, videography, documentaries, podcast studio, and event coverage. Premium quality for brands, tourism, and events."
-        url="https://atlanticcreators.com/"
+        url="https://www.theatlanticcreators.com/"
+        keywords="media production, video production, photography, documentary, podcast studio, event coverage, film production, cinematic content, brand content, tourism media, Atlantic Creators"
       />
       <HeroSection />
       <ServicesOverview />

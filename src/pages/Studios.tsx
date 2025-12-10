@@ -38,7 +38,7 @@ const Studios = () => {
       <SEO 
         title="Studio Spaces"
         description="Book our state-of-the-art media and podcast studios. Professional equipment, versatile spaces, and expert support for photoshoots, video production, and podcast recording."
-        url="https://atlanticcreators.com/studios"
+        url="https://www.theatlanticcreators.com/studios"
         keywords="media studio rental, podcast studio, production studio, studio booking, professional studio space, video production studio"
       />
       {/* Hero Section */}

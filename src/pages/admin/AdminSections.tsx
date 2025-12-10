@@ -29,6 +29,7 @@ import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { ImageUploader } from '@/components/admin/ImageUploader';
+import { MediaUploader } from '@/components/admin/MediaUploader';
 import { SectionPreview } from '@/components/admin/SectionPreview';
 
 interface Page {
@@ -98,7 +99,7 @@ const SECTION_TEMPLATES: Record<string, ContentField[]> = {
     { key: 'secondaryButtonText', label: 'Secondary CTA Text', type: 'text', placeholder: 'Learn More' },
     { key: 'secondaryButtonUrl', label: 'Secondary CTA URL', type: 'url', placeholder: '/about' },
     { key: 'backgroundImage', label: 'Background Image', type: 'image' },
-    { key: 'videoUrl', label: 'Background Video URL', type: 'url', placeholder: 'https://...' },
+    { key: 'videoUrl', label: 'Background Video', type: 'video' },
     { key: 'overlayOpacity', label: 'Overlay Opacity (0-1)', type: 'number', placeholder: '0.7' },
   ],
   about: [
@@ -158,7 +159,7 @@ const SECTION_TEMPLATES: Record<string, ContentField[]> = {
     { key: 'subheading', label: 'Subheading', type: 'text', placeholder: 'Professional Audio' },
     { key: 'body', label: 'Description', type: 'textarea', placeholder: 'Describe the studio...' },
     { key: 'imageUrl', label: 'Featured Image', type: 'image' },
-    { key: 'videoUrl', label: 'Video Tour URL', type: 'url' },
+    { key: 'videoUrl', label: 'Video Tour', type: 'video' },
     { key: 'buttonText', label: 'CTA Text', type: 'text', placeholder: 'Book Studio' },
     { key: 'buttonUrl', label: 'CTA URL', type: 'url', placeholder: '/contact' },
   ],
@@ -167,7 +168,7 @@ const SECTION_TEMPLATES: Record<string, ContentField[]> = {
     { key: 'subheading', label: 'Studio Type', type: 'text', placeholder: 'Video Production' },
     { key: 'body', label: 'Description', type: 'textarea', placeholder: 'Studio features...' },
     { key: 'imageUrl', label: 'Studio Image', type: 'image' },
-    { key: 'videoUrl', label: 'Studio Tour Video', type: 'url' },
+    { key: 'videoUrl', label: 'Studio Tour Video', type: 'video' },
     { key: 'buttonText', label: 'Book Button Text', type: 'text', placeholder: 'Book Now' },
     { key: 'buttonUrl', label: 'Book Button URL', type: 'url' },
   ],
@@ -199,7 +200,7 @@ const SECTION_TEMPLATES: Record<string, ContentField[]> = {
     { key: 'body', label: 'Body Text', type: 'textarea', placeholder: 'Section content...' },
     { key: 'imageUrl', label: 'Image', type: 'image' },
     { key: 'imageAlt', label: 'Image Alt Text', type: 'text' },
-    { key: 'videoUrl', label: 'Video URL', type: 'url' },
+    { key: 'videoUrl', label: 'Video', type: 'video' },
     { key: 'buttonText', label: 'Button Text', type: 'text', placeholder: 'Click here' },
     { key: 'buttonUrl', label: 'Button URL', type: 'url', placeholder: '/page' },
     { key: 'buttonStyle', label: 'Button Style', type: 'select', options: [
@@ -486,6 +487,18 @@ const AdminSections = () => {
             value={formData.content[field.key] || ''}
             onChange={(url) => updateContentField(field.key, url)}
             placeholder={field.placeholder}
+          />
+        );
+      
+      case 'video':
+        return (
+          <MediaUploader
+            value={formData.content[field.key] || ''}
+            onChange={(url) => updateContentField(field.key, url)}
+            placeholder={field.placeholder}
+            mediaType="video"
+            maxSizeMB={50}
+            label={field.label}
           />
         );
       

@@ -98,7 +98,7 @@ const Services = () => {
       <SEO 
         title="Our Services"
         description="Complete media production services including content creation, commercial production, documentary filmmaking, tourism media, podcast studio, and event coverage."
-        url="https://atlanticcreators.com/services"
+        url="https://www.theatlanticcreators.com/services"
         keywords="media production services, video production, photography services, documentary production, podcast studio, event coverage, commercial advertising"
       />
       {/* Hero Section */}

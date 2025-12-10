@@ -11,7 +11,7 @@ const Privacy = () => {
       <SEO 
         title="Privacy Policy"
         description="Privacy Policy for Atlantic Creators Company. Learn how we collect, use, and protect your personal information."
-        url="https://atlanticcreators.com/privacy"
+        url="https://www.theatlanticcreators.com/privacy"
       />
       
       {/* Hero Section */}
