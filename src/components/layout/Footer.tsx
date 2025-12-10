@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Instagram, Youtube, Linkedin, Mail, MapPin, Phone } from "lucide-react";
+import { Instagram, Mail } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 const footerLinks = {
@@ -17,18 +17,11 @@ const footerLinks = {
   ],
   creators: [
     { name: "Join Collective", path: "/creators" },
-    { name: "Artist Portal", path: "/portal" },
     { name: "Studio Spaces", path: "/studios" },
     { name: "Event Coverage", path: "/events" },
     { name: "Blog", path: "/blog" },
   ],
 };
-
-const socialLinks = [
-  { icon: Instagram, href: "#", label: "Instagram" },
-  { icon: Youtube, href: "#", label: "YouTube" },
-  { icon: Linkedin, href: "#", label: "LinkedIn" },
-];
 
 export const Footer = () => {
   return (
@@ -47,16 +40,15 @@ export const Footer = () => {
               Where cinematic vision meets professional execution. Full-service media production for brands, events, and visionaries.
             </p>
             <div className="flex space-x-4">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  aria-label={social.label}
-                  className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all duration-300"
-                >
-                  <social.icon size={18} />
-                </a>
-              ))}
+              <a
+                href="https://www.instagram.com/atlanticcreatorscompany/?utm_source=ig_web_button_share_sheet"
+                aria-label="Follow us on Instagram"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-[#E4405F] hover:text-white transition-all duration-300"
+              >
+                <Instagram size={18} />
+              </a>
             </div>
           </div>
 
@@ -114,18 +106,10 @@ export const Footer = () => {
         <div className="mt-12 pt-8 border-t border-border">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
-              <a href="mailto:hello@atlanticcreators.com" className="flex items-center gap-2 hover:text-primary transition-colors">
+              <a href="mailto:theatlanticcreators@gmail.com" className="flex items-center gap-2 hover:text-primary transition-colors">
                 <Mail size={16} />
-                hello@atlanticcreators.com
+                theatlanticcreators@gmail.com
               </a>
-              <a href="tel:+1234567890" className="flex items-center gap-2 hover:text-primary transition-colors">
-                <Phone size={16} />
-                +1 (234) 567-890
-              </a>
-              <span className="flex items-center gap-2">
-                <MapPin size={16} />
-                Atlantic City, USA
-              </span>
             </div>
           </div>
         </div>
