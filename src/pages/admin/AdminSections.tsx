@@ -28,7 +28,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { ImageUploader } from '@/components/admin/ImageUploader';
 import { MediaUploader } from '@/components/admin/MediaUploader';
 import { SectionPreview } from '@/components/admin/SectionPreview';
 
@@ -483,10 +482,13 @@ const AdminSections = () => {
       
       case 'image':
         return (
-          <ImageUploader
+          <MediaUploader
             value={formData.content[field.key] || ''}
             onChange={(url) => updateContentField(field.key, url)}
             placeholder={field.placeholder}
+            mediaType="image"
+            maxSizeMB={10}
+            label={field.label}
           />
         );
       

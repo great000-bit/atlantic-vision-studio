@@ -1,7 +1,8 @@
-import { useState, useRef } from 'react';
-import { Upload, X, Loader2, Image as ImageIcon, Video, Link as LinkIcon } from 'lucide-react';
+import { useState, useRef, useCallback } from 'react';
+import { Upload, X, Loader2, Image as ImageIcon, Video, Link as LinkIcon, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -17,7 +18,7 @@ interface MediaUploaderProps {
 }
 
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-const ACCEPTED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
+const ACCEPTED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo'];
 
 export const MediaUploader = ({ 
   value, 
@@ -30,6 +31,8 @@ export const MediaUploader = ({
   const [isUploading, setIsUploading] = useState(false);
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [uploadComplete, setUploadComplete] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -41,8 +44,8 @@ export const MediaUploader = ({
 
   const getAcceptString = () => {
     if (mediaType === 'image') return 'image/*';
-    if (mediaType === 'video') return 'video/mp4,video/webm,video/quicktime';
-    return 'image/*,video/mp4,video/webm,video/quicktime';
+    if (mediaType === 'video') return 'video/mp4,video/webm,video/quicktime,video/x-msvideo';
+    return 'image/*,video/mp4,video/webm,video/quicktime,video/x-msvideo';
   };
 
   const isVideoUrl = (url: string) => {
@@ -50,10 +53,7 @@ export const MediaUploader = ({
     return videoExtensions.some(ext => url.toLowerCase().includes(ext));
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const uploadFile = async (file: File) => {
     const acceptedTypes = getAcceptedTypes();
     const isImage = file.type.startsWith('image/');
     const isVideo = file.type.startsWith('video/');
@@ -81,6 +81,18 @@ export const MediaUploader = ({
 
     setIsUploading(true);
     setUploadProgress(0);
+    setUploadComplete(false);
+
+    // Simulate progress for better UX
+    const progressInterval = setInterval(() => {
+      setUploadProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(progressInterval);
+          return prev;
+        }
+        return prev + 10;
+      });
+    }, 200);
 
     try {
       const fileExt = file.name.split('.').pop();
@@ -97,20 +109,29 @@ export const MediaUploader = ({
 
       if (uploadError) throw uploadError;
 
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+
       const { data: urlData } = supabase.storage
         .from('cms-uploads')
         .getPublicUrl(filePath);
 
       onChange(urlData.publicUrl);
+      setUploadComplete(true);
+      
       toast({ 
-        title: 'Success', 
-        description: `${isVideo ? 'Video' : 'Image'} uploaded successfully.` 
+        title: 'Upload Complete', 
+        description: `${isVideo ? 'Video' : 'Image'} uploaded successfully and ready to use.` 
       });
+
+      // Reset complete state after 2 seconds
+      setTimeout(() => setUploadComplete(false), 2000);
     } catch (error: any) {
+      clearInterval(progressInterval);
       console.error('Upload error:', error);
       toast({
         title: 'Upload failed',
-        description: error.message || 'Failed to upload file.',
+        description: error.message || 'Failed to upload file. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -121,6 +142,36 @@ export const MediaUploader = ({
       }
     }
   };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      await uploadFile(file);
+    }
+  };
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  }, []);
+
+  const handleDrop = useCallback(async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      await uploadFile(file);
+    }
+  }, [mediaType, maxSizeMB]);
 
   const handleRemove = () => {
     onChange('');
@@ -164,6 +215,11 @@ export const MediaUploader = ({
             Video
           </span>
         )}
+        {uploadComplete && (
+          <div className="absolute inset-0 bg-green-500/20 flex items-center justify-center">
+            <CheckCircle className="text-green-500" size={48} />
+          </div>
+        )}
       </div>
     );
   };
@@ -181,8 +237,14 @@ export const MediaUploader = ({
     return 'Upload Media';
   };
 
+  const getDropzoneLabel = () => {
+    if (mediaType === 'video') return 'Drag & drop video here or click to browse';
+    if (mediaType === 'image') return 'Drag & drop image here or click to browse';
+    return 'Drag & drop media here or click to browse';
+  };
+
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {label && (
         <label className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
           {getIcon()}
@@ -191,49 +253,100 @@ export const MediaUploader = ({
       )}
       
       {/* Preview */}
-      {renderPreview()}
+      {value && renderPreview()}
 
-      {/* Upload Controls */}
-      <div className="flex gap-2">
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept={getAcceptString()}
-          onChange={handleFileUpload}
-          className="hidden"
-        />
-        
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isUploading}
-          className="flex-1"
+      {/* Drag & Drop Zone */}
+      {!value && (
+        <div
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          onClick={() => !isUploading && fileInputRef.current?.click()}
+          className={`
+            relative border-2 border-dashed rounded-lg p-6 text-center cursor-pointer
+            transition-all duration-200 ease-in-out
+            ${isDragOver 
+              ? 'border-primary bg-primary/10' 
+              : 'border-border hover:border-primary/50 hover:bg-muted/50'
+            }
+            ${isUploading ? 'pointer-events-none opacity-70' : ''}
+          `}
         >
-          {isUploading ? (
-            <>
-              <Loader2 size={14} className="mr-2 animate-spin" />
-              {uploadProgress > 0 ? `${uploadProgress}%` : 'Uploading...'}
-            </>
-          ) : (
-            <>
-              <Upload size={14} className="mr-2" />
-              {getButtonLabel()}
-            </>
-          )}
-        </Button>
+          <div className="flex flex-col items-center gap-2">
+            {isUploading ? (
+              <>
+                <Loader2 size={32} className="animate-spin text-primary" />
+                <p className="text-sm text-muted-foreground">Uploading... {uploadProgress}%</p>
+              </>
+            ) : (
+              <>
+                <Upload size={32} className="text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">{getDropzoneLabel()}</p>
+                <p className="text-xs text-muted-foreground/70">
+                  {mediaType === 'video' && 'MP4, WebM, MOV (max 50MB)'}
+                  {mediaType === 'image' && 'JPG, PNG, GIF, WebP (max 5MB)'}
+                  {mediaType === 'both' && 'Images or Videos (max 50MB)'}
+                </p>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => setShowUrlInput(!showUrlInput)}
-        >
-          <LinkIcon size={14} className="mr-1" />
-          {showUrlInput ? 'Hide URL' : 'URL'}
-        </Button>
-      </div>
+      {/* Upload Progress Bar */}
+      {isUploading && (
+        <div className="space-y-1">
+          <Progress value={uploadProgress} className="h-2" />
+          <p className="text-xs text-muted-foreground text-center">
+            {uploadProgress < 100 ? 'Uploading to server...' : 'Processing...'}
+          </p>
+        </div>
+      )}
+
+      {/* Hidden File Input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept={getAcceptString()}
+        onChange={handleFileUpload}
+        className="hidden"
+      />
+
+      {/* Action Buttons */}
+      {value && (
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
+            className="flex-1"
+          >
+            {isUploading ? (
+              <>
+                <Loader2 size={14} className="mr-2 animate-spin" />
+                {uploadProgress}%
+              </>
+            ) : (
+              <>
+                <Upload size={14} className="mr-2" />
+                Replace
+              </>
+            )}
+          </Button>
+
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowUrlInput(!showUrlInput)}
+          >
+            <LinkIcon size={14} className="mr-1" />
+            {showUrlInput ? 'Hide' : 'URL'}
+          </Button>
+        </div>
+      )}
 
       {/* URL Input */}
       {showUrlInput && (
@@ -244,13 +357,6 @@ export const MediaUploader = ({
           className="bg-background text-sm"
         />
       )}
-
-      {/* Help text */}
-      <p className="text-xs text-muted-foreground">
-        {mediaType === 'video' && 'Supported: MP4, WebM (max 50MB)'}
-        {mediaType === 'image' && 'Supported: JPG, PNG, GIF, WebP (max 5MB)'}
-        {mediaType === 'both' && 'Supported: Images (JPG, PNG) or Videos (MP4, WebM)'}
-      </p>
     </div>
   );
 };
