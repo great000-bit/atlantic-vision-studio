@@ -89,7 +89,7 @@ const Contact = () => {
       <SEO 
         title="Contact Us"
         description="Get in touch with Atlantic Creators Company. Tell us about your project and we'll bring your vision to life with premium media production."
-        url="https://atlanticcreators.com/contact"
+        url="https://www.theatlanticcreators.com/contact"
         keywords="contact Atlantic Creators, media production inquiry, book media production, project consultation"
       />
       {/* Hero Section */}

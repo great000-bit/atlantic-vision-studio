@@ -154,7 +154,7 @@ const Portfolio = () => {
       <SEO 
         title="Portfolio"
         description="Explore our curated portfolio of photography, videography, documentaries, commercials, and event coverage. See our best work for top brands and events."
-        url="https://atlanticcreators.com/portfolio"
+        url="https://www.theatlanticcreators.com/portfolio"
         keywords="media production portfolio, video portfolio, photography portfolio, documentary work, commercial campaigns, event coverage examples"
       />
       {/* Hero Section */}

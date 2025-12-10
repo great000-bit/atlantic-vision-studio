@@ -1,6 +1,13 @@
 # Atlantic Creators Company - Robots.txt
+# Domain: www.theatlanticcreators.com
 
 User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Googlebot-Video
 Allow: /
 
 User-agent: Bingbot
@@ -15,11 +22,36 @@ Allow: /
 User-agent: LinkedInBot
 Allow: /
 
+User-agent: WhatsApp
+Allow: /
+
+User-agent: TelegramBot
+Allow: /
+
+User-agent: Slackbot
+Allow: /
+
+User-agent: Discordbot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
 User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://atlanticcreators.com/sitemap.xml
+Sitemap: https://www.theatlanticcreators.com/sitemap.xml
 
-# Disallow admin/portal areas from indexing
-Disallow: /portal/dashboard
+# Disallow admin areas from indexing
+Disallow: /admin
+Disallow: /admin/*

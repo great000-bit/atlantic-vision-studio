@@ -137,7 +137,7 @@ const Creators = () => {
       <SEO 
         title="Creators Collective"
         description="Join Atlantic Creators Collective - a network of professional photographers, videographers, editors, and audio professionals. Access premium projects and transparent payments."
-        url="https://atlanticcreators.com/creators"
+        url="https://www.theatlanticcreators.com/creators"
         keywords="join creators collective, freelance videographer, freelance photographer, media production network, creator opportunities"
       />
       {/* Hero Section */}

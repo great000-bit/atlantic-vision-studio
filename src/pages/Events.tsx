@@ -83,7 +83,7 @@ const Events = () => {
       <SEO 
         title="Festival & Conference Coverage"
         description="Professional event media coverage for music festivals, corporate conferences, concerts, and private events. Multi-camera videography, aerial shots, and highlight reels."
-        url="https://atlanticcreators.com/events"
+        url="https://www.theatlanticcreators.com/events"
         keywords="event coverage, festival videography, conference media, corporate event photography, live event production, event highlight reels"
       />
       {/* Hero Section */}
