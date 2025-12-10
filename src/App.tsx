@@ -20,6 +20,7 @@ const Studios = lazy(() => import("./pages/Studios"));
 const Events = lazy(() => import("./pages/Events"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Blog = lazy(() => import("./pages/Blog"));
+const Privacy = lazy(() => import("./pages/Privacy"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Admin pages
@@ -70,6 +71,7 @@ const App = () => (
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:id" element={<Blog />} />
+                <Route path="/privacy" element={<Privacy />} />
                 
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />

@@ -1,15 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Layout } from "@/components/layout/Layout";
-import { 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Send,
-  Instagram,
-  Youtube,
-  Linkedin
-} from "lucide-react";
+import { Mail, Send, Instagram } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { SEO } from "@/components/SEO";
 import { contactFormSchema, sanitizeInput, type ContactFormData } from "@/lib/validation";
@@ -46,7 +38,6 @@ const Contact = () => {
     setIsSubmitting(true);
     setErrors({});
 
-    // Sanitize inputs
     const sanitizedData = {
       ...formData,
       name: sanitizeInput(formData.name),
@@ -55,7 +46,6 @@ const Contact = () => {
       timeline: sanitizeInput(formData.timeline),
     };
 
-    // Validate with zod
     const result = contactFormSchema.safeParse(sanitizedData);
     
     if (!result.success) {
@@ -74,7 +64,6 @@ const Contact = () => {
       return;
     }
 
-    // Simulate form submission
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     toast({
@@ -152,9 +141,9 @@ const Contact = () => {
               
               <address className="space-y-8 not-italic">
                 <a
-                  href="mailto:hello@atlanticcreators.com"
+                  href="mailto:theatlanticcreators@gmail.com"
                   className="flex items-center gap-5 group"
-                  aria-label="Email us at hello@atlanticcreators.com"
+                  aria-label="Email us at theatlanticcreators@gmail.com"
                 >
                   <div className="w-14 h-14 rounded-xl bg-card border border-border flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all duration-300" aria-hidden="true">
                     <Mail size={22} />
@@ -162,58 +151,25 @@ const Contact = () => {
                   <div>
                     <div className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Email</div>
                     <div className="text-foreground text-lg font-medium group-hover:text-primary transition-colors">
-                      hello@atlanticcreators.com
+                      theatlanticcreators@gmail.com
                     </div>
                   </div>
                 </a>
-                <a
-                  href="tel:+1234567890"
-                  className="flex items-center gap-5 group"
-                  aria-label="Call us at +1 234 567 890"
-                >
-                  <div className="w-14 h-14 rounded-xl bg-card border border-border flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all duration-300" aria-hidden="true">
-                    <Phone size={22} />
-                  </div>
-                  <div>
-                    <div className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Phone</div>
-                    <div className="text-foreground text-lg font-medium group-hover:text-primary transition-colors">
-                      +1 (234) 567-890
-                    </div>
-                  </div>
-                </a>
-                <div className="flex items-center gap-5">
-                  <div className="w-14 h-14 rounded-xl bg-card border border-border flex items-center justify-center text-primary" aria-hidden="true">
-                    <MapPin size={22} />
-                  </div>
-                  <div>
-                    <div className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Location</div>
-                    <div className="text-foreground text-lg font-medium">
-                      Atlantic City, USA
-                    </div>
-                  </div>
-                </div>
               </address>
 
-              {/* Social Links */}
+              {/* Social Links - Instagram Only */}
               <nav className="pt-6 border-t border-border" aria-label="Social media links">
                 <h3 className="text-muted-foreground text-xs uppercase tracking-wider mb-4">Follow Us</h3>
                 <div className="flex gap-4">
-                  {[
-                    { icon: Instagram, href: "https://instagram.com/atlanticcreators", label: "Follow us on Instagram" },
-                    { icon: Youtube, href: "https://youtube.com/atlanticcreators", label: "Subscribe to our YouTube channel" },
-                    { icon: Linkedin, href: "https://linkedin.com/company/atlanticcreators", label: "Connect with us on LinkedIn" },
-                  ].map((social) => (
-                    <a
-                      key={social.label}
-                      href={social.href}
-                      aria-label={social.label}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-12 h-12 rounded-xl bg-card border border-border flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300"
-                    >
-                      <social.icon size={20} aria-hidden="true" />
-                    </a>
-                  ))}
+                  <a
+                    href="https://www.instagram.com/atlanticcreatorscompany/?utm_source=ig_web_button_share_sheet"
+                    aria-label="Follow us on Instagram"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-12 h-12 rounded-xl bg-card border border-border flex items-center justify-center text-muted-foreground hover:bg-[#E4405F] hover:text-white hover:border-[#E4405F] transition-all duration-300"
+                  >
+                    <Instagram size={20} aria-hidden="true" />
+                  </a>
                 </div>
               </nav>
             </motion.aside>
@@ -277,50 +233,27 @@ const Contact = () => {
                     </div>
                   </div>
 
-                  <div className="grid sm:grid-cols-2 gap-6">
-                    <div>
-                      <label htmlFor="email" className="block text-xs uppercase tracking-wider font-medium text-muted-foreground mb-3">
-                        Email <span className="text-primary" aria-label="required">*</span>
-                      </label>
-                      <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        required
-                        autoComplete="email"
-                        maxLength={255}
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className={`w-full px-5 py-4 bg-background border rounded-xl text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 ${errors.email ? 'border-destructive' : 'border-border'}`}
-                        placeholder="your@email.com"
-                        aria-invalid={!!errors.email}
-                        aria-describedby={errors.email ? "email-error" : undefined}
-                      />
-                      {errors.email && (
-                        <p id="email-error" className="text-destructive text-sm mt-1" role="alert">{errors.email}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label htmlFor="phone" className="block text-xs uppercase tracking-wider font-medium text-muted-foreground mb-3">
-                        Phone
-                      </label>
-                      <input
-                        type="tel"
-                        id="phone"
-                        name="phone"
-                        autoComplete="tel"
-                        maxLength={20}
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className={`w-full px-5 py-4 bg-background border rounded-xl text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 ${errors.phone ? 'border-destructive' : 'border-border'}`}
-                        placeholder="+1 (234) 567-890"
-                        aria-invalid={!!errors.phone}
-                        aria-describedby={errors.phone ? "phone-error" : undefined}
-                      />
-                      {errors.phone && (
-                        <p id="phone-error" className="text-destructive text-sm mt-1" role="alert">{errors.phone}</p>
-                      )}
-                    </div>
+                  <div>
+                    <label htmlFor="email" className="block text-xs uppercase tracking-wider font-medium text-muted-foreground mb-3">
+                      Email <span className="text-primary" aria-label="required">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      required
+                      autoComplete="email"
+                      maxLength={255}
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className={`w-full px-5 py-4 bg-background border rounded-xl text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 ${errors.email ? 'border-destructive' : 'border-border'}`}
+                      placeholder="your@email.com"
+                      aria-invalid={!!errors.email}
+                      aria-describedby={errors.email ? "email-error" : undefined}
+                    />
+                    {errors.email && (
+                      <p id="email-error" className="text-destructive text-sm mt-1" role="alert">{errors.email}</p>
+                    )}
                   </div>
 
                   <div className="grid sm:grid-cols-2 gap-6">
@@ -376,11 +309,10 @@ const Contact = () => {
                       className="w-full px-5 py-4 bg-background border border-border rounded-xl text-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"
                     >
                       <option value="">Select budget range</option>
-                      <option value="under-5k">Under $5,000</option>
-                      <option value="5k-10k">$5,000 - $10,000</option>
-                      <option value="10k-25k">$10,000 - $25,000</option>
-                      <option value="25k-50k">$25,000 - $50,000</option>
-                      <option value="50k+">$50,000+</option>
+                      <option value="Under $5,000">Under $5,000</option>
+                      <option value="$5,000 - $15,000">$5,000 - $15,000</option>
+                      <option value="$15,000 - $50,000">$15,000 - $50,000</option>
+                      <option value="$50,000+">$50,000+</option>
                     </select>
                   </div>
 
@@ -397,7 +329,7 @@ const Contact = () => {
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                       className={`w-full px-5 py-4 bg-background border rounded-xl text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 resize-none ${errors.message ? 'border-destructive' : 'border-border'}`}
-                      placeholder="Tell us about your project, goals, and any specific requirements..."
+                      placeholder="Tell us about your project, goals, and vision..."
                       aria-invalid={!!errors.message}
                       aria-describedby={errors.message ? "message-error" : undefined}
                     />
@@ -409,18 +341,15 @@ const Contact = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full btn-gold flex items-center justify-center gap-3 text-sm uppercase tracking-wider py-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full btn-gold flex items-center justify-center gap-2 py-4 text-sm uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
                     aria-busy={isSubmitting}
                   >
                     {isSubmitting ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" aria-hidden="true" />
-                        Sending...
-                      </>
+                      "Sending..."
                     ) : (
                       <>
-                        <Send size={18} aria-hidden="true" />
                         Send Message
+                        <Send size={16} aria-hidden="true" />
                       </>
                     )}
                   </button>
@@ -431,13 +360,8 @@ const Contact = () => {
         </div>
       </section>
 
-      {/* Admin Entry Button - Now positioned ABOVE any potential footer/overlays */}
-      <section className="bg-background py-8 relative z-50">
-        <div className="container mx-auto px-6 lg:px-8 flex justify-end">
-          <AdminEntryIcon />
-        </div>
-      </section>
-
+      {/* Admin Entry Icon */}
+      <AdminEntryIcon />
     </Layout>
   );
 };
