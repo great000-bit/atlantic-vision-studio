@@ -13,8 +13,9 @@ import {
   Video
 } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import { useSectionContent, getContentValue } from "@/hooks/useSectionContent";
 
-const mediaStudioFeatures = [
+const defaultMediaStudioFeatures = [
   "4K Multi-camera setup",
   "Professional lighting rigs",
   "Seamless backdrops & sets",
@@ -23,7 +24,7 @@ const mediaStudioFeatures = [
   "High-end equipment available",
 ];
 
-const podcastStudioFeatures = [
+const defaultPodcastStudioFeatures = [
   "Soundproof recording room",
   "Multi-channel audio mixer",
   "Podcast video recording",
@@ -33,6 +34,33 @@ const podcastStudioFeatures = [
 ];
 
 const Studios = () => {
+  const { data: heroSection } = useSectionContent('studios', 'hero');
+  const { data: mediaStudioSection } = useSectionContent('studios', 'media-studio');
+  const { data: podcastStudioSection } = useSectionContent('studios', 'podcast-studio');
+  
+  // Hero content from CMS with fallbacks
+  const heroLabel = getContentValue(heroSection?.content, 'label', 'Our Facilities');
+  const heroHeading = getContentValue(heroSection?.content, 'heading', 'Studio');
+  const heroHeadingHighlight = getContentValue(heroSection?.content, 'headingHighlight', 'Spaces');
+  const heroBody = getContentValue(heroSection?.content, 'body', 'State-of-the-art production facilities for photoshoots, video production, podcasts, and more. Professional equipment, versatile spaces, expert support.');
+  
+  // Media Studio content from CMS
+  const mediaStudioHeading = getContentValue(mediaStudioSection?.content, 'heading', 'Media Studio');
+  const mediaStudioBody = getContentValue(mediaStudioSection?.content, 'body', 'Our fully equipped media studio is perfect for photoshoots, product media, commercials, interviews, and more. With high-end lighting, cinematic sets, and professional equipment, we create the perfect environment for your vision.');
+  const mediaStudioFeatures = getContentValue(mediaStudioSection?.content, 'features', defaultMediaStudioFeatures) as string[];
+  const mediaStudioImages = getContentValue(mediaStudioSection?.content, 'images', [
+    'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=600&q=80',
+    'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&q=80',
+    'https://images.unsplash.com/photo-1598387993441-a364f854c3e1?w=600&q=80',
+    'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=600&q=80'
+  ]) as string[];
+  
+  // Podcast Studio content from CMS
+  const podcastStudioHeading = getContentValue(podcastStudioSection?.content, 'heading', 'Podcast Studio');
+  const podcastStudioBody = getContentValue(podcastStudioSection?.content, 'body', 'Our sound-proof, studio-grade podcast room features pro-level audio gear — ideal for interviews, talk shows, voice-overs, and branded podcasts. Multi-camera video capability included.');
+  const podcastStudioFeatures = getContentValue(podcastStudioSection?.content, 'features', defaultPodcastStudioFeatures) as string[];
+  const podcastStudioImage = getContentValue(podcastStudioSection?.content, 'imageUrl', 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&q=80');
+
   return (
     <Layout>
       <SEO 
@@ -52,15 +80,14 @@ const Studios = () => {
             className="max-w-4xl mx-auto text-center"
           >
             <span className="inline-block text-primary text-sm font-medium tracking-[0.2em] uppercase mb-4">
-              Our Facilities
+              {heroLabel}
             </span>
             <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
-              Studio{" "}
-              <span className="text-gradient-gold">Spaces</span>
+              {heroHeading}{" "}
+              <span className="text-gradient-gold">{heroHeadingHighlight}</span>
             </h1>
             <p className="text-muted-foreground text-lg md:text-xl leading-relaxed">
-              State-of-the-art production facilities for photoshoots, video production, 
-              podcasts, and more. Professional equipment, versatile spaces, expert support.
+              {heroBody}
             </p>
           </motion.div>
         </div>
@@ -85,16 +112,14 @@ const Studios = () => {
                 </span>
               </div>
               <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Media Studio
+                {mediaStudioHeading}
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-6">
-                Our fully equipped media studio is perfect for photoshoots, product media, 
-                commercials, interviews, and more. With high-end lighting, cinematic sets, 
-                and professional equipment, we create the perfect environment for your vision.
+                {mediaStudioBody}
               </p>
               <ul className="grid sm:grid-cols-2 gap-3 mb-8">
-                {mediaStudioFeatures.map((feature) => (
-                  <li key={feature} className="flex items-center gap-3 text-foreground">
+                {mediaStudioFeatures.map((feature, idx) => (
+                  <li key={idx} className="flex items-center gap-3 text-foreground">
                     <Check size={18} className="text-primary flex-shrink-0" />
                     {feature}
                   </li>
@@ -120,14 +145,14 @@ const Studios = () => {
                 <div className="space-y-4">
                   <div className="aspect-[4/5] rounded-xl overflow-hidden">
                     <img
-                      src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=600&q=80"
+                      src={mediaStudioImages[0] || "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=600&q=80"}
                       alt="Media studio setup"
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="aspect-square rounded-xl overflow-hidden">
                     <img
-                      src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&q=80"
+                      src={mediaStudioImages[1] || "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&q=80"}
                       alt="Camera equipment"
                       className="w-full h-full object-cover"
                     />
@@ -136,14 +161,14 @@ const Studios = () => {
                 <div className="space-y-4 pt-8">
                   <div className="aspect-square rounded-xl overflow-hidden">
                     <img
-                      src="https://images.unsplash.com/photo-1598387993441-a364f854c3e1?w=600&q=80"
+                      src={mediaStudioImages[2] || "https://images.unsplash.com/photo-1598387993441-a364f854c3e1?w=600&q=80"}
                       alt="Lighting setup"
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="aspect-[4/5] rounded-xl overflow-hidden">
                     <img
-                      src="https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=600&q=80"
+                      src={mediaStudioImages[3] || "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=600&q=80"}
                       alt="Behind the scenes"
                       className="w-full h-full object-cover"
                     />
@@ -168,7 +193,7 @@ const Studios = () => {
             >
               <div className="aspect-video rounded-2xl overflow-hidden">
                 <img
-                  src="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&q=80"
+                  src={podcastStudioImage}
                   alt="Podcast studio"
                   className="w-full h-full object-cover"
                 />
@@ -206,16 +231,14 @@ const Studios = () => {
                 </span>
               </div>
               <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Podcast Studio
+                {podcastStudioHeading}
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-6">
-                Our sound-proof, studio-grade podcast room features pro-level audio gear — 
-                ideal for interviews, talk shows, voice-overs, and branded podcasts. 
-                Multi-camera video capability included.
+                {podcastStudioBody}
               </p>
               <ul className="grid sm:grid-cols-2 gap-3 mb-8">
-                {podcastStudioFeatures.map((feature) => (
-                  <li key={feature} className="flex items-center gap-3 text-foreground">
+                {podcastStudioFeatures.map((feature, idx) => (
+                  <li key={idx} className="flex items-center gap-3 text-foreground">
                     <Check size={18} className="text-primary flex-shrink-0" />
                     {feature}
                   </li>

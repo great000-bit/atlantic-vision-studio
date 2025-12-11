@@ -86,19 +86,18 @@ interface ContentField {
 // Comprehensive section templates for all content types
 const SECTION_TEMPLATES: Record<string, ContentField[]> = {
   hero: [
-    { key: 'heading', label: 'Main Heading', type: 'text', placeholder: 'Your headline here' },
+    { key: 'heading', label: 'Main Heading (Line 1)', type: 'text', placeholder: 'Cinematic Stories.' },
+    { key: 'headingHighlight', label: 'Heading Highlight (Line 2)', type: 'text', placeholder: 'Impactful Visuals.' },
+    { key: 'headingLine3', label: 'Heading Line 3', type: 'text', placeholder: 'Complete Media Solutions.' },
+    { key: 'tagline', label: 'Tagline', type: 'text', placeholder: 'Cinematic Media. Unified Creators. National Impact.' },
     { key: 'subheading', label: 'Subheading', type: 'text', placeholder: 'Supporting tagline' },
     { key: 'body', label: 'Body Text', type: 'textarea', placeholder: 'Additional description' },
-    { key: 'buttonText', label: 'Primary CTA Text', type: 'text', placeholder: 'Get Started' },
-    { key: 'buttonUrl', label: 'Primary CTA URL', type: 'url', placeholder: '/contact' },
-    { key: 'buttonStyle', label: 'Primary Button Style', type: 'select', options: [
-      { value: 'primary', label: 'Primary (Gold)' },
-      { value: 'secondary', label: 'Secondary (Outline)' },
-    ]},
-    { key: 'secondaryButtonText', label: 'Secondary CTA Text', type: 'text', placeholder: 'Learn More' },
-    { key: 'secondaryButtonUrl', label: 'Secondary CTA URL', type: 'url', placeholder: '/about' },
+    { key: 'primaryButtonText', label: 'Primary CTA Text', type: 'text', placeholder: 'Explore Portfolio' },
+    { key: 'primaryButtonUrl', label: 'Primary CTA URL', type: 'url', placeholder: '/portfolio' },
+    { key: 'secondaryButtonText', label: 'Secondary CTA Text', type: 'text', placeholder: 'Book a Project' },
+    { key: 'secondaryButtonUrl', label: 'Secondary CTA URL', type: 'url', placeholder: '/contact' },
     { key: 'backgroundImage', label: 'Background Image', type: 'image' },
-    { key: 'videoUrl', label: 'Background Video', type: 'video' },
+    { key: 'videoUrl', label: 'Background Video (Upload)', type: 'video' },
     { key: 'overlayOpacity', label: 'Overlay Opacity (0-1)', type: 'number', placeholder: '0.7' },
   ],
   about: [
