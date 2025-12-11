@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Play, ArrowRight } from "lucide-react";
-import heroBg from "@/assets/hero-bg.mp4";
+import heroBgFallback from "@/assets/hero-bg.mp4";
 import { useSectionContent, getContentValue } from "@/hooks/useSectionContent";
 
 const defaultStats = [
@@ -15,6 +15,7 @@ export const HeroSection = () => {
   const { data: section } = useSectionContent('home', 'hero');
   const content = section?.content;
 
+  // All text content from CMS with fallbacks
   const heading = getContentValue(content, 'heading', 'Cinematic Stories.');
   const headingHighlight = getContentValue(content, 'headingHighlight', 'Impactful Visuals.');
   const headingLine3 = getContentValue(content, 'headingLine3', 'Complete Media Solutions.');
@@ -24,26 +25,39 @@ export const HeroSection = () => {
   const secondaryButtonText = getContentValue(content, 'secondaryButtonText', 'Book a Project');
   const secondaryButtonUrl = getContentValue(content, 'secondaryButtonUrl', '/contact');
   const stats = getContentValue(content, 'stats', defaultStats) as { value: string; label: string }[];
+  
+  // Media from CMS with fallbacks - allows admin to upload custom video/image
+  const videoUrl = getContentValue(content, 'videoUrl', '');
+  const backgroundImage = getContentValue(content, 'backgroundImage', '');
+  const heroVideo = videoUrl || heroBgFallback;
 
   return (
     <section 
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
       aria-label="Hero section"
     >
-      {/* Cinematic Background Video */}
+      {/* Cinematic Background Video/Image from CMS */}
       <div className="absolute inset-0">
-        <video
-          src={heroBg}
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="auto"
-          disablePictureInPicture
-          disableRemotePlayback
-          className="w-full h-full object-cover"
-          style={{ willChange: 'transform', transform: 'translateZ(0)' }}
-        />
+        {heroVideo ? (
+          <video
+            src={heroVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            disablePictureInPicture
+            disableRemotePlayback
+            className="w-full h-full object-cover"
+            style={{ willChange: 'transform', transform: 'translateZ(0)' }}
+          />
+        ) : backgroundImage ? (
+          <img
+            src={backgroundImage}
+            alt="Hero background"
+            className="w-full h-full object-cover"
+          />
+        ) : null}
         <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/90" />
         <div className="absolute inset-0 bg-gradient-to-r from-background/50 via-transparent to-background/50" />
       </div>
