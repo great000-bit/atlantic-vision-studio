@@ -22,13 +22,30 @@ interface AdminLayoutProps {
   children: ReactNode;
 }
 
+import {
+  Home,
+  Info,
+  Briefcase,
+  Users,
+  Building2,
+  Calendar,
+  Mail,
+} from 'lucide-react';
+
 const navItems = [
   { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
-  { name: 'Pages', path: '/admin/pages', icon: FileText },
-  { name: 'Sections', path: '/admin/sections', icon: Layers },
-  { name: 'Images', path: '/admin/images', icon: Image },
+  { name: 'Homepage', path: '/admin/home', icon: Home },
+  { name: 'About', path: '/admin/about', icon: Info },
+  { name: 'Services', path: '/admin/services', icon: Briefcase },
   { name: 'Portfolio', path: '/admin/portfolio', icon: FolderKanban },
+  { name: 'Creators', path: '/admin/creators', icon: Users },
+  { name: 'Studios', path: '/admin/studios', icon: Building2 },
+  { name: 'Events', path: '/admin/events', icon: Calendar },
+  { name: 'Contact', path: '/admin/contact', icon: Mail },
   { name: 'Blog', path: '/admin/blog', icon: BookOpen },
+  { name: 'All Sections', path: '/admin/sections', icon: Layers },
+  { name: 'Images', path: '/admin/images', icon: Image },
+  { name: 'Pages', path: '/admin/pages', icon: FileText },
   { name: 'Recycle Bin', path: '/admin/recycle-bin', icon: Trash2 },
 ];
 
