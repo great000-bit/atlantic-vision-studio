@@ -32,10 +32,22 @@ const AdminImages = lazy(() => import("./pages/admin/AdminImages"));
 const AdminPortfolio = lazy(() => import("./pages/admin/AdminPortfolio"));
 const AdminBlog = lazy(() => import("./pages/admin/AdminBlog"));
 const AdminRecycleBin = lazy(() => import("./pages/admin/AdminRecycleBin"));
+const AdminHome = lazy(() => import("./pages/admin/AdminHome"));
+const AdminAbout = lazy(() => import("./pages/admin/AdminAbout"));
+const AdminServices = lazy(() => import("./pages/admin/AdminServices"));
+const AdminCreators = lazy(() => import("./pages/admin/AdminCreators"));
+const AdminStudios = lazy(() => import("./pages/admin/AdminStudios"));
+const AdminEvents = lazy(() => import("./pages/admin/AdminEvents"));
+const AdminContact = lazy(() => import("./pages/admin/AdminContact"));
 
-// Minimal page loader - only shows briefly during initial load
+// Animated page loader
 const PageLoader = () => (
-  <div className="min-h-screen bg-background" />
+  <div className="min-h-screen bg-background flex items-center justify-center">
+    <div className="flex flex-col items-center gap-4">
+      <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      <p className="text-sm text-muted-foreground animate-pulse">Loading...</p>
+    </div>
+  </div>
 );
 
 const queryClient = new QueryClient({
@@ -75,6 +87,13 @@ const App = () => (
                 
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
+                <Route path="/admin/home" element={<ProtectedAdminRoute><AdminHome /></ProtectedAdminRoute>} />
+                <Route path="/admin/about" element={<ProtectedAdminRoute><AdminAbout /></ProtectedAdminRoute>} />
+                <Route path="/admin/services" element={<ProtectedAdminRoute><AdminServices /></ProtectedAdminRoute>} />
+                <Route path="/admin/creators" element={<ProtectedAdminRoute><AdminCreators /></ProtectedAdminRoute>} />
+                <Route path="/admin/studios" element={<ProtectedAdminRoute><AdminStudios /></ProtectedAdminRoute>} />
+                <Route path="/admin/events" element={<ProtectedAdminRoute><AdminEvents /></ProtectedAdminRoute>} />
+                <Route path="/admin/contact" element={<ProtectedAdminRoute><AdminContact /></ProtectedAdminRoute>} />
                 <Route path="/admin/pages" element={<ProtectedAdminRoute><AdminPages /></ProtectedAdminRoute>} />
                 <Route path="/admin/sections" element={<ProtectedAdminRoute><AdminSections /></ProtectedAdminRoute>} />
                 <Route path="/admin/sections/:pageId" element={<ProtectedAdminRoute><AdminSections /></ProtectedAdminRoute>} />
