@@ -1,10 +1,8 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
+import { useForm, ValidationError } from '@formspree/react';
 import { Layout } from "@/components/layout/Layout";
-import { Mail, Send, Instagram } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Mail, Send, Instagram, CheckCircle } from "lucide-react";
 import { SEO } from "@/components/SEO";
-import { contactFormSchema, sanitizeInput, type ContactFormData } from "@/lib/validation";
 import { AdminEntryIcon } from "@/components/admin/AdminEntryIcon";
 
 const projectTypes = [
@@ -19,70 +17,41 @@ const projectTypes = [
 ];
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    company: "",
-    email: "",
-    phone: "",
-    projectType: "",
-    timeline: "",
-    budget: "",
-    message: "",
-  });
-  const [errors, setErrors] = useState<Partial<Record<keyof ContactFormData, string>>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
+  const [state, handleSubmit] = useForm("xwpgwvpo");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setErrors({});
-
-    const sanitizedData = {
-      ...formData,
-      name: sanitizeInput(formData.name),
-      company: sanitizeInput(formData.company),
-      message: sanitizeInput(formData.message),
-      timeline: sanitizeInput(formData.timeline),
-    };
-
-    const result = contactFormSchema.safeParse(sanitizedData);
-    
-    if (!result.success) {
-      const fieldErrors: Partial<Record<keyof ContactFormData, string>> = {};
-      result.error.errors.forEach((err) => {
-        const field = err.path[0] as keyof ContactFormData;
-        fieldErrors[field] = err.message;
-      });
-      setErrors(fieldErrors);
-      setIsSubmitting(false);
-      toast({
-        title: "Validation Error",
-        description: "Please check the form for errors.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    toast({
-      title: "Message Sent!",
-      description: "Thank you for reaching out. We'll get back to you within 24-48 hours.",
-    });
-    
-    setFormData({
-      name: "",
-      company: "",
-      email: "",
-      phone: "",
-      projectType: "",
-      timeline: "",
-      budget: "",
-      message: "",
-    });
-    setIsSubmitting(false);
-  };
+  if (state.succeeded) {
+    return (
+      <Layout>
+        <SEO 
+          title="Contact Us"
+          description="Get in touch with Atlantic Creators Company."
+          url="https://www.theatlanticcreators.com/contact"
+        />
+        <section className="pt-32 pb-20 bg-background min-h-screen flex items-center justify-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="text-center max-w-lg mx-auto px-6"
+          >
+            <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="w-10 h-10 text-primary" />
+            </div>
+            <h1 className="font-heading text-3xl font-bold text-foreground mb-4">
+              Message Sent!
+            </h1>
+            <p className="text-muted-foreground text-lg mb-8">
+              Thank you for contacting us. We'll be in touch shortly.
+            </p>
+            <a href="/contact" onClick={() => window.location.reload()} className="btn-gold inline-flex items-center gap-2">
+              Back to Contact
+            </a>
+          </motion.div>
+        </section>
+        <AdminEntryIcon />
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -191,7 +160,7 @@ const Contact = () => {
                     Tell us about your vision and we'll get back to you within 24 hours.
                   </p>
                 </div>
-                <form onSubmit={handleSubmit} className="space-y-6" noValidate aria-label="Contact form">
+                <form onSubmit={handleSubmit} className="space-y-6" aria-label="Contact form">
                   <div className="grid sm:grid-cols-2 gap-6">
                     <div>
                       <label htmlFor="name" className="block text-xs uppercase tracking-wider font-medium text-muted-foreground mb-3">
@@ -204,16 +173,10 @@ const Contact = () => {
                         required
                         autoComplete="name"
                         maxLength={100}
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className={`w-full px-5 py-4 bg-background border rounded-xl text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 ${errors.name ? 'border-destructive' : 'border-border'}`}
+                        className="w-full px-5 py-4 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"
                         placeholder="Your name"
-                        aria-invalid={!!errors.name}
-                        aria-describedby={errors.name ? "name-error" : undefined}
                       />
-                      {errors.name && (
-                        <p id="name-error" className="text-destructive text-sm mt-1" role="alert">{errors.name}</p>
-                      )}
+                      <ValidationError prefix="Name" field="name" errors={state.errors} className="text-destructive text-sm mt-1" />
                     </div>
                     <div>
                       <label htmlFor="company" className="block text-xs uppercase tracking-wider font-medium text-muted-foreground mb-3">
@@ -225,8 +188,6 @@ const Contact = () => {
                         name="company"
                         autoComplete="organization"
                         maxLength={100}
-                        value={formData.company}
-                        onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                         className="w-full px-5 py-4 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"
                         placeholder="Your company"
                       />
@@ -244,16 +205,10 @@ const Contact = () => {
                       required
                       autoComplete="email"
                       maxLength={255}
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className={`w-full px-5 py-4 bg-background border rounded-xl text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 ${errors.email ? 'border-destructive' : 'border-border'}`}
+                      className="w-full px-5 py-4 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"
                       placeholder="your@email.com"
-                      aria-invalid={!!errors.email}
-                      aria-describedby={errors.email ? "email-error" : undefined}
                     />
-                    {errors.email && (
-                      <p id="email-error" className="text-destructive text-sm mt-1" role="alert">{errors.email}</p>
-                    )}
+                    <ValidationError prefix="Email" field="email" errors={state.errors} className="text-destructive text-sm mt-1" />
                   </div>
 
                   <div className="grid sm:grid-cols-2 gap-6">
@@ -265,20 +220,14 @@ const Contact = () => {
                         id="projectType"
                         name="projectType"
                         required
-                        value={formData.projectType}
-                        onChange={(e) => setFormData({ ...formData, projectType: e.target.value })}
-                        className={`w-full px-5 py-4 bg-background border rounded-xl text-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 ${errors.projectType ? 'border-destructive' : 'border-border'}`}
-                        aria-invalid={!!errors.projectType}
-                        aria-describedby={errors.projectType ? "projectType-error" : undefined}
+                        className="w-full px-5 py-4 bg-background border border-border rounded-xl text-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"
                       >
                         <option value="">Select project type</option>
                         {projectTypes.map((type) => (
                           <option key={type} value={type}>{type}</option>
                         ))}
                       </select>
-                      {errors.projectType && (
-                        <p id="projectType-error" className="text-destructive text-sm mt-1" role="alert">{errors.projectType}</p>
-                      )}
+                      <ValidationError prefix="Project Type" field="projectType" errors={state.errors} className="text-destructive text-sm mt-1" />
                     </div>
                     <div>
                       <label htmlFor="timeline" className="block text-xs uppercase tracking-wider font-medium text-muted-foreground mb-3">
@@ -289,8 +238,6 @@ const Contact = () => {
                         id="timeline"
                         name="timeline"
                         maxLength={100}
-                        value={formData.timeline}
-                        onChange={(e) => setFormData({ ...formData, timeline: e.target.value })}
                         className="w-full px-5 py-4 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"
                         placeholder="e.g., Q1 2025"
                       />
@@ -304,8 +251,6 @@ const Contact = () => {
                     <select
                       id="budget"
                       name="budget"
-                      value={formData.budget}
-                      onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
                       className="w-full px-5 py-4 bg-background border border-border rounded-xl text-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"
                     >
                       <option value="">Select budget range</option>
@@ -326,25 +271,19 @@ const Contact = () => {
                       required
                       rows={5}
                       maxLength={2000}
-                      value={formData.message}
-                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className={`w-full px-5 py-4 bg-background border rounded-xl text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 resize-none ${errors.message ? 'border-destructive' : 'border-border'}`}
+                      className="w-full px-5 py-4 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 resize-none"
                       placeholder="Tell us about your project, goals, and vision..."
-                      aria-invalid={!!errors.message}
-                      aria-describedby={errors.message ? "message-error" : undefined}
                     />
-                    {errors.message && (
-                      <p id="message-error" className="text-destructive text-sm mt-1" role="alert">{errors.message}</p>
-                    )}
+                    <ValidationError prefix="Message" field="message" errors={state.errors} className="text-destructive text-sm mt-1" />
                   </div>
 
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={state.submitting}
                     className="w-full btn-gold flex items-center justify-center gap-2 py-4 text-sm uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
-                    aria-busy={isSubmitting}
+                    aria-busy={state.submitting}
                   >
-                    {isSubmitting ? (
+                    {state.submitting ? (
                       "Sending..."
                     ) : (
                       <>
