@@ -7,7 +7,6 @@ import {
   Camera, 
   Mic2, 
   Check, 
-  Lightbulb, 
   Monitor, 
   Headphones,
   Video
@@ -33,10 +32,17 @@ const defaultPodcastStudioFeatures = [
   "Professional monitoring",
 ];
 
+const defaultBookingPackages = [
+  { name: "Hourly", price: "$150", period: "per hour", featured: false, features: ["Studio access", "Basic equipment", "1 technician support"] },
+  { name: "Half Day", price: "$500", period: "4 hours", featured: true, features: ["Studio access", "Full equipment", "2 technician support", "Editing suite access"] },
+  { name: "Full Day", price: "$900", period: "8 hours", featured: false, features: ["Studio access", "Full equipment", "Full crew support", "Editing suite", "Catering included"] },
+];
+
 const Studios = () => {
   const { data: heroSection } = useSectionContent('studios', 'hero');
   const { data: mediaStudioSection } = useSectionContent('studios', 'media-studio');
   const { data: podcastStudioSection } = useSectionContent('studios', 'podcast-studio');
+  const { data: bookingSection } = useSectionContent('studios', 'booking');
   
   // Hero content from CMS with fallbacks
   const heroLabel = getContentValue(heroSection?.content, 'label', 'Our Facilities');
@@ -60,6 +66,12 @@ const Studios = () => {
   const podcastStudioBody = getContentValue(podcastStudioSection?.content, 'body', 'Our sound-proof, studio-grade podcast room features pro-level audio gear — ideal for interviews, talk shows, voice-overs, and branded podcasts. Multi-camera video capability included.');
   const podcastStudioFeatures = getContentValue(podcastStudioSection?.content, 'features', defaultPodcastStudioFeatures) as string[];
   const podcastStudioImage = getContentValue(podcastStudioSection?.content, 'imageUrl', 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&q=80');
+
+  // Booking content from CMS
+  const bookingLabel = getContentValue(bookingSection?.content, 'label', 'Booking');
+  const bookingHeading = getContentValue(bookingSection?.content, 'heading', 'Studio Packages');
+  const bookingSubheading = getContentValue(bookingSection?.content, 'subheading', 'Flexible booking options for all your production needs.');
+  const bookingPackages = getContentValue(bookingSection?.content, 'packages', defaultBookingPackages) as { name: string; price: string; period: string; featured: boolean; features: string[] }[];
 
   return (
     <Layout>
@@ -260,33 +272,13 @@ const Studios = () => {
       <section className="section-padding bg-card">
         <div className="container mx-auto px-6 lg:px-8">
           <SectionHeading
-            label="Booking"
-            title="Studio Packages"
-            subtitle="Flexible booking options for all your production needs."
+            label={bookingLabel}
+            title={bookingHeading}
+            subtitle={bookingSubheading}
           />
 
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {[
-              {
-                name: "Hourly",
-                price: "$150",
-                period: "per hour",
-                features: ["Studio access", "Basic equipment", "1 technician support"],
-              },
-              {
-                name: "Half Day",
-                price: "$500",
-                period: "4 hours",
-                features: ["Studio access", "Full equipment", "2 technician support", "Editing suite access"],
-                featured: true,
-              },
-              {
-                name: "Full Day",
-                price: "$900",
-                period: "8 hours",
-                features: ["Studio access", "Full equipment", "Full crew support", "Editing suite", "Catering included"],
-              },
-            ].map((pkg, index) => (
+            {bookingPackages.map((pkg, index) => (
               <motion.div
                 key={pkg.name}
                 initial={{ opacity: 0, y: 30 }}
