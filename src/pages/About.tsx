@@ -4,54 +4,30 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Link } from "react-router-dom";
 import { ArrowRight, Target, Eye, Heart, Users } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import { useSectionContent, getContentValue } from "@/hooks/useSectionContent";
 
-const teamMembers = [
-  {
-    name: "Alex Rivera",
-    role: "Creative Director",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
-  },
-  {
-    name: "Sarah Chen",
-    role: "Lead Cinematographer",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80",
-  },
-  {
-    name: "Marcus Williams",
-    role: "Post-Production Lead",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80",
-  },
-  {
-    name: "Emma Thompson",
-    role: "Producer",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&q=80",
-  },
+const defaultTeamMembers = [
+  { name: "Alex Rivera", role: "Creative Director", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80" },
+  { name: "Sarah Chen", role: "Lead Cinematographer", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80" },
+  { name: "Marcus Williams", role: "Post-Production Lead", image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80" },
+  { name: "Emma Thompson", role: "Producer", image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&q=80" },
 ];
 
 const values = [
-  {
-    icon: Target,
-    title: "Excellence",
-    description: "We pursue excellence in every frame, every edit, every delivery.",
-  },
-  {
-    icon: Eye,
-    title: "Vision",
-    description: "We see beyond the obvious to create content that resonates.",
-  },
-  {
-    icon: Heart,
-    title: "Passion",
-    description: "We love what we do, and it shows in our work.",
-  },
-  {
-    icon: Users,
-    title: "Collaboration",
-    description: "We believe the best work comes from great partnerships.",
-  },
+  { icon: Target, title: "Excellence", description: "We pursue excellence in every frame, every edit, every delivery." },
+  { icon: Eye, title: "Vision", description: "We see beyond the obvious to create content that resonates." },
+  { icon: Heart, title: "Passion", description: "We love what we do, and it shows in our work." },
+  { icon: Users, title: "Collaboration", description: "We believe the best work comes from great partnerships." },
 ];
 
 const About = () => {
+  const { data: teamSection } = useSectionContent('about', 'team');
+  
+  const teamLabel = getContentValue(teamSection?.content, 'label', 'Our Team');
+  const teamHeading = getContentValue(teamSection?.content, 'heading', 'Meet the Creators');
+  const teamSubheading = getContentValue(teamSection?.content, 'subheading', 'The talented individuals who bring your vision to life.');
+  const teamMembers = getContentValue(teamSection?.content, 'members', defaultTeamMembers) as { name: string; role: string; image: string }[];
+
   return (
     <Layout>
       <SEO 
@@ -171,9 +147,9 @@ const About = () => {
       <section className="section-padding bg-card">
         <div className="container mx-auto px-6 lg:px-8">
           <SectionHeading
-            label="Our Team"
-            title="Meet the Creators"
-            subtitle="The talented individuals who bring your vision to life."
+            label={teamLabel}
+            title={teamHeading}
+            subtitle={teamSubheading}
           />
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">

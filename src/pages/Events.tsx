@@ -4,28 +4,19 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Link } from "react-router-dom";
 import { ArrowRight, Check, Camera, Video, Plane, Radio, Scissors, Users } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import { useSectionContent, getContentValue } from "@/hooks/useSectionContent";
 
-const eventTypes = [
-  {
-    title: "Music Festivals",
-    description: "Capture the energy, the crowds, the performances — creating lasting memories of unforgettable moments.",
-    image: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=800&q=80",
-  },
-  {
-    title: "Corporate Events",
-    description: "Professional coverage for conferences, seminars, product launches, and corporate gatherings.",
-    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80",
-  },
-  {
-    title: "Conferences",
-    description: "Multi-day conference coverage with keynote captures, panel discussions, and networking moments.",
-    image: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&q=80",
-  },
-  {
-    title: "Private Events",
-    description: "Weddings, galas, and exclusive gatherings documented with cinematic elegance.",
-    image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80",
-  },
+const defaultEventTypes = [
+  { title: "Music Festivals", description: "Capture the energy, the crowds, the performances — creating lasting memories of unforgettable moments.", image: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=800&q=80" },
+  { title: "Corporate Events", description: "Professional coverage for conferences, seminars, product launches, and corporate gatherings.", image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80" },
+  { title: "Conferences", description: "Multi-day conference coverage with keynote captures, panel discussions, and networking moments.", image: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&q=80" },
+  { title: "Private Events", description: "Weddings, galas, and exclusive gatherings documented with cinematic elegance.", image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80" },
+];
+
+const defaultPackages = [
+  { name: "Essential", description: "Perfect for smaller events and single-day coverage.", featured: false, features: ["2 videographers", "Photography coverage", "4K video capture", "Highlight reel (2-3 min)", "48-hour delivery"] },
+  { name: "Professional", description: "Comprehensive coverage for medium-scale events.", featured: true, features: ["4 videographers", "2 photographers", "Drone footage", "Live streaming setup", "Same-day highlights", "Full event documentary"] },
+  { name: "Premium", description: "Full-scale production for major events and festivals.", featured: false, features: ["Full production crew", "Multi-camera setup", "Aerial cinematography", "Live streaming + recording", "Real-time social content", "Multi-format deliverables", "Dedicated project manager"] },
 ];
 
 const capabilities = [
@@ -37,47 +28,20 @@ const capabilities = [
   { icon: Users, label: "Dedicated Event Team" },
 ];
 
-const packages = [
-  {
-    name: "Essential",
-    description: "Perfect for smaller events and single-day coverage.",
-    features: [
-      "2 videographers",
-      "Photography coverage",
-      "4K video capture",
-      "Highlight reel (2-3 min)",
-      "48-hour delivery",
-    ],
-  },
-  {
-    name: "Professional",
-    description: "Comprehensive coverage for medium-scale events.",
-    features: [
-      "4 videographers",
-      "2 photographers",
-      "Drone footage",
-      "Live streaming setup",
-      "Same-day highlights",
-      "Full event documentary",
-    ],
-    featured: true,
-  },
-  {
-    name: "Premium",
-    description: "Full-scale production for major events and festivals.",
-    features: [
-      "Full production crew",
-      "Multi-camera setup",
-      "Aerial cinematography",
-      "Live streaming + recording",
-      "Real-time social content",
-      "Multi-format deliverables",
-      "Dedicated project manager",
-    ],
-  },
-];
-
 const Events = () => {
+  const { data: eventTypesSection } = useSectionContent('events', 'event-types');
+  const { data: packagesSection } = useSectionContent('events', 'packages');
+
+  const eventTypesLabel = getContentValue(eventTypesSection?.content, 'label', 'What We Cover');
+  const eventTypesHeading = getContentValue(eventTypesSection?.content, 'heading', 'Event Types');
+  const eventTypesSubheading = getContentValue(eventTypesSection?.content, 'subheading', 'Whether it\'s a music festival, corporate conference, or intimate gathering — we bring the same level of excellence.');
+  const eventTypes = getContentValue(eventTypesSection?.content, 'items', defaultEventTypes) as { title: string; description: string; image: string }[];
+
+  const packagesLabel = getContentValue(packagesSection?.content, 'label', 'Packages');
+  const packagesHeading = getContentValue(packagesSection?.content, 'heading', 'Coverage Options');
+  const packagesSubheading = getContentValue(packagesSection?.content, 'subheading', 'Choose a package that fits your event scale and needs.');
+  const packages = getContentValue(packagesSection?.content, 'items', defaultPackages) as { name: string; description: string; featured: boolean; features: string[] }[];
+
   return (
     <Layout>
       <SEO 
@@ -138,9 +102,9 @@ const Events = () => {
       <section className="section-padding bg-background">
         <div className="container mx-auto px-6 lg:px-8">
           <SectionHeading
-            label="What We Cover"
-            title="Event Types"
-            subtitle="Whether it's a music festival, corporate conference, or intimate gathering — we bring the same level of excellence."
+            label={eventTypesLabel}
+            title={eventTypesHeading}
+            subtitle={eventTypesSubheading}
           />
 
           <div className="grid md:grid-cols-2 gap-8">
@@ -177,9 +141,9 @@ const Events = () => {
       <section className="section-padding bg-card">
         <div className="container mx-auto px-6 lg:px-8">
           <SectionHeading
-            label="Packages"
-            title="Coverage Options"
-            subtitle="Choose a package that fits your event scale and needs."
+            label={packagesLabel}
+            title={packagesHeading}
+            subtitle={packagesSubheading}
           />
 
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -241,26 +205,10 @@ const Events = () => {
 
             <div className="space-y-8">
               {[
-                {
-                  step: "01",
-                  title: "Consultation",
-                  description: "We discuss your event, understand your goals, and recommend the best coverage approach.",
-                },
-                {
-                  step: "02",
-                  title: "Planning",
-                  description: "Detailed shot lists, crew assignments, equipment prep, and logistics coordination.",
-                },
-                {
-                  step: "03",
-                  title: "Execution",
-                  description: "Our experienced team captures every moment with precision and creativity.",
-                },
-                {
-                  step: "04",
-                  title: "Delivery",
-                  description: "Fast turnaround on edited content, from highlight reels to full event documentaries.",
-                },
+                { step: "01", title: "Consultation", description: "We discuss your event, understand your goals, and recommend the best coverage approach." },
+                { step: "02", title: "Planning", description: "Detailed shot lists, crew assignments, equipment prep, and logistics coordination." },
+                { step: "03", title: "Execution", description: "Our experienced team captures every moment with precision and creativity." },
+                { step: "04", title: "Delivery", description: "Fast turnaround on edited content, from highlight reels to full event documentaries." },
               ].map((item, index) => (
                 <motion.div
                   key={item.step}
