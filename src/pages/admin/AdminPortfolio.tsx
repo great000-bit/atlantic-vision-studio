@@ -9,6 +9,8 @@ import {
   X,
   Star,
   Upload,
+  Video,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
@@ -16,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { Progress } from '@/components/ui/progress';
 
 interface PortfolioItem {
   id: string;
@@ -37,7 +40,7 @@ const categories = [
   'Documentary',
   'Commercial',
   'Events',
-  'Tourism Media',
+  'Tourism',
   'Podcast',
 ];
 
@@ -57,8 +60,11 @@ const AdminPortfolio = () => {
     is_featured: false,
   });
   const [isSaving, setIsSaving] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isUploadingVideo, setIsUploadingVideo] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const fetchItems = async () => {
@@ -132,16 +138,35 @@ const AdminPortfolio = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setIsUploading(true);
+    // Validate file type
+    const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!validImageTypes.includes(file.type)) {
+      toast({
+        title: 'Invalid file type',
+        description: 'Please upload an image (JPEG, PNG, GIF, WebP)',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsUploadingImage(true);
+    setUploadProgress(0);
 
     try {
-      const fileExt = file.name.split('.').pop();
+      const fileExt = file.name.split('.').pop()?.toLowerCase();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-      const filePath = `portfolio/${fileName}`;
+      const filePath = `portfolio/images/${fileName}`;
+
+      // Simulate progress for UX
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => Math.min(prev + 10, 90));
+      }, 100);
 
       const { error: uploadError } = await supabase.storage
         .from('cms-uploads')
-        .upload(filePath, file);
+        .upload(filePath, file, { cacheControl: '3600', upsert: true });
+
+      clearInterval(progressInterval);
 
       if (uploadError) throw uploadError;
 
@@ -149,8 +174,9 @@ const AdminPortfolio = () => {
         .from('cms-uploads')
         .getPublicUrl(filePath);
 
+      setUploadProgress(100);
       setFormData({ ...formData, thumbnail_image: publicUrl.publicUrl });
-      toast({ title: 'Success', description: 'Image uploaded.' });
+      toast({ title: 'Success', description: 'Image uploaded successfully!' });
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -158,7 +184,74 @@ const AdminPortfolio = () => {
         variant: 'destructive',
       });
     } finally {
-      setIsUploading(false);
+      setIsUploadingImage(false);
+      setUploadProgress(0);
+    }
+  };
+
+  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validVideoTypes = ['video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo'];
+    if (!validVideoTypes.includes(file.type)) {
+      toast({
+        title: 'Invalid file type',
+        description: 'Please upload a video (MP4, WebM, MOV, AVI)',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Validate file size (max 100MB)
+    const maxSize = 100 * 1024 * 1024;
+    if (file.size > maxSize) {
+      toast({
+        title: 'File too large',
+        description: 'Maximum video size is 100MB',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsUploadingVideo(true);
+    setUploadProgress(0);
+
+    try {
+      const fileExt = file.name.split('.').pop()?.toLowerCase();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `portfolio/videos/${fileName}`;
+
+      // Simulate progress for UX
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => Math.min(prev + 5, 90));
+      }, 200);
+
+      const { error: uploadError } = await supabase.storage
+        .from('cms-uploads')
+        .upload(filePath, file, { cacheControl: '3600', upsert: true });
+
+      clearInterval(progressInterval);
+
+      if (uploadError) throw uploadError;
+
+      const { data: publicUrl } = supabase.storage
+        .from('cms-uploads')
+        .getPublicUrl(filePath);
+
+      setUploadProgress(100);
+      setFormData({ ...formData, video_url: publicUrl.publicUrl });
+      toast({ title: 'Success', description: 'Video uploaded successfully!' });
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to upload video.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsUploadingVideo(false);
+      setUploadProgress(0);
     }
   };
 
@@ -442,45 +535,122 @@ const AdminPortfolio = () => {
                     />
                   </div>
 
+                  {/* Thumbnail Image Upload */}
                   <div>
                     <label className="block text-sm font-medium text-muted-foreground mb-2">
+                      <ImageIcon size={14} className="inline mr-1" />
                       Thumbnail Image
                     </label>
-                    <div className="flex gap-2">
-                      <Input
-                        value={formData.thumbnail_image}
-                        onChange={(e) => setFormData({ ...formData, thumbnail_image: e.target.value })}
-                        placeholder="Image URL or upload..."
-                        className="bg-background flex-1"
-                      />
-                      <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handleImageUpload}
-                        accept="image/*"
-                        className="hidden"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={isUploading}
-                      >
-                        {isUploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
-                      </Button>
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <Input
+                          value={formData.thumbnail_image}
+                          onChange={(e) => setFormData({ ...formData, thumbnail_image: e.target.value })}
+                          placeholder="Image URL or upload from device..."
+                          className="bg-background flex-1"
+                        />
+                        <input
+                          type="file"
+                          ref={imageInputRef}
+                          onChange={handleImageUpload}
+                          accept="image/jpeg,image/png,image/gif,image/webp"
+                          className="hidden"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => imageInputRef.current?.click()}
+                          disabled={isUploadingImage}
+                        >
+                          {isUploadingImage ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                        </Button>
+                      </div>
+                      {isUploadingImage && (
+                        <Progress value={uploadProgress} className="h-2" />
+                      )}
+                      {formData.thumbnail_image && (
+                        <div className="relative w-32 h-20 rounded-lg overflow-hidden border border-border">
+                          <img src={formData.thumbnail_image} alt="Preview" className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => setFormData({ ...formData, thumbnail_image: '' })}
+                            className="absolute top-1 right-1 p-1 bg-background/80 rounded-full hover:bg-destructive hover:text-white"
+                          >
+                            <X size={12} />
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
 
+                  {/* Video Upload - FROM DEVICE */}
                   <div>
                     <label className="block text-sm font-medium text-muted-foreground mb-2">
-                      Video URL
+                      <Video size={14} className="inline mr-1" />
+                      Project Video (Upload from Device)
                     </label>
-                    <Input
-                      value={formData.video_url}
-                      onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
-                      placeholder="YouTube or Vimeo URL..."
-                      className="bg-background"
-                    />
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <Input
+                          value={formData.video_url}
+                          onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
+                          placeholder="Video URL or upload MP4/WebM from device..."
+                          className="bg-background flex-1"
+                        />
+                        <input
+                          type="file"
+                          ref={videoInputRef}
+                          onChange={handleVideoUpload}
+                          accept="video/mp4,video/webm,video/quicktime"
+                          className="hidden"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => videoInputRef.current?.click()}
+                          disabled={isUploadingVideo}
+                          className="gap-1"
+                        >
+                          {isUploadingVideo ? (
+                            <Loader2 size={16} className="animate-spin" />
+                          ) : (
+                            <>
+                              <Video size={14} />
+                              <Upload size={14} />
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                      {isUploadingVideo && (
+                        <div className="space-y-1">
+                          <Progress value={uploadProgress} className="h-2" />
+                          <p className="text-xs text-muted-foreground">Uploading video... {uploadProgress}%</p>
+                        </div>
+                      )}
+                      {formData.video_url && (
+                        <div className="relative rounded-lg overflow-hidden border border-border">
+                          <video 
+                            src={formData.video_url} 
+                            className="w-full h-32 object-cover"
+                            muted
+                            playsInline
+                          />
+                          <div className="absolute bottom-1 left-1 px-2 py-0.5 bg-background/80 rounded text-xs text-foreground">
+                            Video Preview
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setFormData({ ...formData, video_url: '' })}
+                            className="absolute top-1 right-1 p-1 bg-background/80 rounded-full hover:bg-destructive hover:text-white"
+                          >
+                            <X size={12} />
+                          </button>
+                        </div>
+                      )}
+                      <p className="text-xs text-muted-foreground">
+                        Supported: MP4, WebM, MOV (max 100MB). Videos will autoplay muted on the frontend.
+                      </p>
+                    </div>
                   </div>
 
                   <div>
