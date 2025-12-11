@@ -412,13 +412,36 @@ export const PageSectionCards = ({
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">
-                      Heading
+                      Label (Small Text Above Heading)
                     </label>
                     <Input
-                      value={formData.heading || ''}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, heading: e.target.value }))}
-                      placeholder="Section heading"
+                      value={formData.label || ''}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, label: e.target.value }))}
+                      placeholder="e.g., Our Services, About Us"
                     />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        Heading
+                      </label>
+                      <Input
+                        value={formData.heading || ''}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, heading: e.target.value }))}
+                        placeholder="Section heading"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        Heading Highlight (Gold Text)
+                      </label>
+                      <Input
+                        value={formData.headingHighlight || ''}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, headingHighlight: e.target.value }))}
+                        placeholder="Highlighted part"
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -452,8 +475,8 @@ export const PageSectionCards = ({
                       Button Text
                     </label>
                     <Input
-                      value={formData.buttonText || ''}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, buttonText: e.target.value }))}
+                      value={formData.buttonText || formData.ctaText || ''}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, buttonText: e.target.value, ctaText: e.target.value }))}
                       placeholder="Button label"
                     />
                   </div>
@@ -462,12 +485,40 @@ export const PageSectionCards = ({
                       Button URL
                     </label>
                     <Input
-                      value={formData.buttonUrl || ''}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, buttonUrl: e.target.value }))}
+                      value={formData.buttonUrl || formData.ctaUrl || ''}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, buttonUrl: e.target.value, ctaUrl: e.target.value }))}
                       placeholder="/contact"
                     />
                   </div>
                 </div>
+
+                {/* Features List (if present in content) */}
+                {(formData.features || Array.isArray(formData.items)) && (
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      Features / Items (one per line)
+                    </label>
+                    <Textarea
+                      value={
+                        Array.isArray(formData.features) 
+                          ? formData.features.join('\n') 
+                          : Array.isArray(formData.items) && typeof formData.items[0] === 'string'
+                            ? formData.items.join('\n')
+                            : ''
+                      }
+                      onChange={(e) => {
+                        const items = e.target.value.split('\n').filter(Boolean);
+                        if (formData.features) {
+                          setFormData((prev) => ({ ...prev, features: items }));
+                        } else {
+                          setFormData((prev) => ({ ...prev, items }));
+                        }
+                      }}
+                      placeholder="Enter one feature per line"
+                      rows={4}
+                    />
+                  </div>
+                )}
 
                 {/* Image Upload */}
                 <div>
