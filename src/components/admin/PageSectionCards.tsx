@@ -493,7 +493,7 @@ export const PageSectionCards = ({
                 </div>
 
                 {/* Features List (if present in content) */}
-                {(formData.features || Array.isArray(formData.items)) && (
+                {(formData.features || (Array.isArray(formData.items) && typeof formData.items[0] === 'string')) && (
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">
                       Features / Items (one per line)
@@ -517,6 +517,110 @@ export const PageSectionCards = ({
                       placeholder="Enter one feature per line"
                       rows={4}
                     />
+                  </div>
+                )}
+
+                {/* Team Members Editor */}
+                {Array.isArray(formData.members) && (
+                  <div className="space-y-4">
+                    <label className="block text-sm font-medium text-foreground">
+                      Team Members
+                    </label>
+                    {formData.members.map((member: { name: string; role: string; image: string }, idx: number) => (
+                      <div key={idx} className="p-4 bg-muted/50 rounded-lg space-y-3">
+                        <div className="flex items-center gap-4">
+                          <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                            {member.image ? (
+                              <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <ImageIcon className="w-8 h-8 text-muted-foreground" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1 space-y-2">
+                            <Input
+                              value={member.name}
+                              onChange={(e) => {
+                                const newMembers = [...formData.members];
+                                newMembers[idx] = { ...newMembers[idx], name: e.target.value };
+                                setFormData((prev) => ({ ...prev, members: newMembers }));
+                              }}
+                              placeholder="Name"
+                              className="h-9"
+                            />
+                            <Input
+                              value={member.role}
+                              onChange={(e) => {
+                                const newMembers = [...formData.members];
+                                newMembers[idx] = { ...newMembers[idx], role: e.target.value };
+                                setFormData((prev) => ({ ...prev, members: newMembers }));
+                              }}
+                              placeholder="Role"
+                              className="h-9"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            id={`member-image-${idx}`}
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              
+                              const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                              if (!validTypes.includes(file.type)) {
+                                toast({ title: 'Invalid file', description: 'Please upload an image', variant: 'destructive' });
+                                return;
+                              }
+                              
+                              try {
+                                const fileExt = file.name.split('.').pop();
+                                const fileName = `team-member-${idx}-${Date.now()}.${fileExt}`;
+                                const filePath = `sections/team/${fileName}`;
+                                
+                                const { error } = await supabase.storage.from('cms-uploads').upload(filePath, file, { upsert: true });
+                                if (error) throw error;
+                                
+                                const { data: { publicUrl } } = supabase.storage.from('cms-uploads').getPublicUrl(filePath);
+                                
+                                const newMembers = [...formData.members];
+                                newMembers[idx] = { ...newMembers[idx], image: publicUrl };
+                                setFormData((prev) => ({ ...prev, members: newMembers }));
+                                
+                                toast({ title: 'Image uploaded', description: `Updated ${member.name}'s photo` });
+                              } catch (err) {
+                                toast({ title: 'Upload failed', description: 'Please try again', variant: 'destructive' });
+                              }
+                            }}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => document.getElementById(`member-image-${idx}`)?.click()}
+                          >
+                            <Upload size={14} className="mr-2" />
+                            {member.image ? 'Change Photo' : 'Upload Photo'}
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const newMembers = [...(formData.members || []), { name: '', role: '', image: '' }];
+                        setFormData((prev) => ({ ...prev, members: newMembers }));
+                      }}
+                    >
+                      <Plus size={14} className="mr-2" />
+                      Add Team Member
+                    </Button>
                   </div>
                 )}
 
