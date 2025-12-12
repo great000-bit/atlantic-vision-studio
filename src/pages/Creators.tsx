@@ -1,30 +1,31 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { useForm, ValidationError } from '@formspree/react';
-import { Layout } from "@/components/layout/Layout";
-import { SectionHeading } from "@/components/ui/SectionHeading";
-import { 
-  Check, 
-  Users, 
-  Wallet, 
-  Briefcase, 
+import {
+  Check,
+  Users,
+  Wallet,
+  Briefcase,
   Star,
   ChevronDown,
   Send,
-  CheckCircle
+  CheckCircle,
 } from "lucide-react";
+import { Layout } from "@/components/layout/Layout";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SEO } from "@/components/SEO";
 
 const benefits = [
   {
     icon: Briefcase,
     title: "Premium Projects",
-    description: "Access national-scale projects with top brands, tourism boards, events, and corporates.",
+    description:
+      "Access national-scale projects with top brands, tourism boards, events, and corporates.",
   },
   {
     icon: Wallet,
     title: "Transparent Payments",
-    description: "Our internal payment portal ensures fair, timely payouts with full transparency.",
+    description:
+      "Our internal payment portal ensures fair, timely payouts with full transparency.",
   },
   {
     icon: Users,
@@ -52,30 +53,76 @@ const roles = [
 const faqs = [
   {
     question: "How does the payment system work?",
-    answer: "We operate on project-based compensation with clear payment terms. Once a project is completed and approved, payments are processed within 7-14 business days through our secure payment portal.",
+    answer:
+      "We operate on project-based compensation with clear payment terms. Once a project is completed and approved, payments are processed within 7-14 business days through our secure payment portal.",
   },
   {
     question: "What's the application process?",
-    answer: "Submit your application through our form with your portfolio. Our team reviews applications weekly. If selected, you'll have a brief interview to discuss your experience and collaboration expectations.",
+    answer:
+      "Submit your application through our form with your portfolio. Our team reviews applications weekly. If selected, you'll have a brief interview to discuss your experience and collaboration expectations.",
   },
   {
     question: "What equipment do I need?",
-    answer: "Requirements vary by role. Generally, we expect professional-grade equipment appropriate to your specialty. Studio projects can utilize our in-house equipment.",
+    answer:
+      "Requirements vary by role. Generally, we expect professional-grade equipment appropriate to your specialty. Studio projects can utilize our in-house equipment.",
   },
   {
     question: "Can I work on my own projects while in the collective?",
-    answer: "Absolutely. We encourage creative freedom. The collective is a collaborative opportunity, not an exclusive contract. You maintain full control over your independent work.",
+    answer:
+      "Absolutely. We encourage creative freedom. The collective is a collaborative opportunity, not an exclusive contract. You maintain full control over your independent work.",
   },
 ];
 
+const PROFORMS_ENDPOINT = "https://app.proforms.top/f/pr1274f8b5";
+
 const Creators = () => {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
-  const [state, handleSubmit] = useForm("xpwvoqja");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  if (state.succeeded) {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    setSubmitting(true);
+
+    try {
+      const formEl = e.currentTarget;
+      const formData = new FormData(formEl);
+      const payload = Object.fromEntries(formData.entries());
+
+      const res = await fetch(PROFORMS_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        let msg = `Submission failed (${res.status})`;
+        try {
+          const json = await res.json();
+          if (json?.message) msg = json.message;
+        } catch {
+          /* ignore */
+        }
+        throw new Error(msg);
+      }
+
+      setSubmitted(true);
+      formEl.reset();
+    } catch (err: any) {
+      setError(err?.message || "An error occurred while submitting the form.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (submitted) {
     return (
       <Layout>
-        <SEO 
+        <SEO
           title="Creators Collective"
           description="Join Atlantic Creators Collective - a network of professional photographers, videographers, editors, and audio professionals."
           url="https://www.theatlanticcreators.com/creators"
@@ -107,13 +154,13 @@ const Creators = () => {
 
   return (
     <Layout>
-      <SEO 
+      <SEO
         title="Creators Collective"
         description="Join Atlantic Creators Collective - a network of professional photographers, videographers, editors, and audio professionals. Access premium projects and transparent payments."
         url="https://www.theatlanticcreators.com/creators"
         keywords="join creators collective, freelance videographer, freelance photographer, media production network, creator opportunities"
       />
-      {/* Hero Section */}
+
       <section className="pt-32 pb-20 bg-background relative overflow-hidden" aria-labelledby="creators-heading">
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal/30 to-transparent pointer-events-none" aria-hidden="true" />
         <div className="container mx-auto px-6 lg:px-8 relative z-10">
@@ -127,19 +174,15 @@ const Creators = () => {
               Join the Collective
             </span>
             <h1 id="creators-heading" className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
-              Creators{" "}
-              <span className="text-gradient-gold">Collective</span>
+              Creators <span className="text-gradient-gold">Collective</span>
             </h1>
             <p className="text-muted-foreground text-lg md:text-xl leading-relaxed">
-              Are you a talented photographer, videographer, editor, or audio professional? 
-              Join our network of creators and collaborate on high-profile projects with 
-              reliable, transparent payments.
+              Are you a talented photographer, videographer, editor, or audio professional? Join our network of creators and collaborate on high-profile projects with reliable, transparent payments.
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Benefits */}
       <section className="section-padding bg-card" aria-labelledby="benefits-heading">
         <div className="container mx-auto px-6 lg:px-8">
           <SectionHeading
@@ -174,7 +217,6 @@ const Creators = () => {
         </div>
       </section>
 
-      {/* Payment Portal Info */}
       <section className="section-padding bg-background" aria-labelledby="portal-heading">
         <div className="container mx-auto px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -191,9 +233,7 @@ const Creators = () => {
                 Transparent, Reliable Payments
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-6">
-                Our internal payment portal is designed with creators in mind. Track your 
-                projects, view payment status, download invoices, and manage your earnings — 
-                all in one secure dashboard.
+                Our internal payment portal is designed with creators in mind. Track your projects, view payment status, download invoices, and manage your earnings — all in one secure dashboard.
               </p>
               <ul className="space-y-3" role="list">
                 {[
@@ -249,7 +289,6 @@ const Creators = () => {
         </div>
       </section>
 
-      {/* Application Form */}
       <section className="section-padding bg-card" aria-labelledby="apply-heading">
         <div className="container mx-auto px-6 lg:px-8">
           <div className="max-w-2xl mx-auto">
@@ -283,7 +322,6 @@ const Creators = () => {
                     className="w-full px-4 py-3 bg-background border border-border rounded-lg input-cinematic"
                     placeholder="Your name"
                   />
-                  <ValidationError prefix="Name" field="name" errors={state.errors} className="text-destructive text-sm mt-1" />
                 </div>
                 <div>
                   <label htmlFor="creator-email" className="block text-sm font-medium text-foreground mb-2">
@@ -299,7 +337,6 @@ const Creators = () => {
                     className="w-full px-4 py-3 bg-background border border-border rounded-lg input-cinematic"
                     placeholder="your@email.com"
                   />
-                  <ValidationError prefix="Email" field="email" errors={state.errors} className="text-destructive text-sm mt-1" />
                 </div>
               </div>
 
@@ -319,7 +356,6 @@ const Creators = () => {
                       <option key={role} value={role}>{role}</option>
                     ))}
                   </select>
-                  <ValidationError prefix="Role" field="role" errors={state.errors} className="text-destructive text-sm mt-1" />
                 </div>
                 <div>
                   <label htmlFor="creator-location" className="block text-sm font-medium text-foreground mb-2">
@@ -335,7 +371,6 @@ const Creators = () => {
                     className="w-full px-4 py-3 bg-background border border-border rounded-lg input-cinematic"
                     placeholder="City, Country"
                   />
-                  <ValidationError prefix="Location" field="location" errors={state.errors} className="text-destructive text-sm mt-1" />
                 </div>
               </div>
 
@@ -351,7 +386,6 @@ const Creators = () => {
                   className="w-full px-4 py-3 bg-background border border-border rounded-lg input-cinematic"
                   placeholder="https://yourportfolio.com"
                 />
-                <ValidationError prefix="Portfolio" field="portfolio" errors={state.errors} className="text-destructive text-sm mt-1" />
               </div>
 
               <div>
@@ -367,17 +401,20 @@ const Creators = () => {
                   className="w-full px-4 py-3 bg-background border border-border rounded-lg input-cinematic resize-none"
                   placeholder="Tell us about your experience, notable projects, and what you bring to the collective..."
                 />
-                <ValidationError prefix="Experience" field="experience" errors={state.errors} className="text-destructive text-sm mt-1" />
               </div>
+
+              {error && (
+                <div className="text-destructive text-sm">
+                  {error}
+                </div>
+              )}
 
               <button
                 type="submit"
-                disabled={state.submitting}
+                disabled={submitting}
                 className="w-full btn-gold flex items-center justify-center gap-2 py-4 text-sm uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {state.submitting ? (
-                  "Submitting..."
-                ) : (
+                {submitting ? "Submitting..." : (
                   <>
                     Submit Application
                     <Send size={16} aria-hidden="true" />
@@ -389,7 +426,6 @@ const Creators = () => {
         </div>
       </section>
 
-      {/* FAQs */}
       <section className="section-padding bg-background" aria-labelledby="faq-heading">
         <div className="container mx-auto px-6 lg:px-8">
           <div className="max-w-3xl mx-auto">
@@ -419,8 +455,8 @@ const Creators = () => {
                     <span className="font-heading font-semibold text-foreground pr-4">
                       {faq.question}
                     </span>
-                    <ChevronDown 
-                      size={20} 
+                    <ChevronDown
+                      size={20}
                       className={`text-primary flex-shrink-0 transition-transform duration-300 ${
                         expandedFaq === index ? "rotate-180" : ""
                       }`}
