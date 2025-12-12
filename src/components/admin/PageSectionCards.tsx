@@ -638,9 +638,10 @@ export const PageSectionCards = ({
                     <label className="block text-sm font-medium text-foreground">
                       Portfolio Projects
                     </label>
-                    {formData.projects.map((project: { id: number; title: string; category: string; image: string }, idx: number) => (
-                      <div key={idx} className="p-4 bg-muted/50 rounded-lg space-y-3">
-                        <div className="flex items-center gap-4">
+                    {formData.projects.map((project: { id: number; title: string; category: string; image: string; mainImage?: string; videoUrl?: string }, idx: number) => (
+                      <div key={idx} className="p-4 bg-muted/50 rounded-lg space-y-4">
+                        {/* Header with preview and text fields */}
+                        <div className="flex items-start gap-4">
                           <div className="relative w-24 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                             {project.image ? (
                               <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
@@ -672,52 +673,188 @@ export const PageSectionCards = ({
                               className="h-9"
                             />
                           </div>
-                        </div>
-                        <div>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            id={`project-image-${idx}`}
-                            onChange={async (e) => {
-                              const file = e.target.files?.[0];
-                              if (!file) return;
-                              
-                              const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-                              if (!validTypes.includes(file.type)) {
-                                toast({ title: 'Invalid file', description: 'Please upload an image', variant: 'destructive' });
-                                return;
-                              }
-                              
-                              try {
-                                const fileExt = file.name.split('.').pop();
-                                const fileName = `project-${idx}-${Date.now()}.${fileExt}`;
-                                const filePath = `sections/projects/${fileName}`;
-                                
-                                const { error } = await supabase.storage.from('cms-uploads').upload(filePath, file, { upsert: true });
-                                if (error) throw error;
-                                
-                                const { data: { publicUrl } } = supabase.storage.from('cms-uploads').getPublicUrl(filePath);
-                                
-                                const newProjects = [...formData.projects];
-                                newProjects[idx] = { ...newProjects[idx], image: publicUrl };
-                                setFormData((prev) => ({ ...prev, projects: newProjects }));
-                                
-                                toast({ title: 'Image uploaded', description: `Updated ${project.title} thumbnail` });
-                              } catch (err) {
-                                toast({ title: 'Upload failed', description: 'Please try again', variant: 'destructive' });
-                              }
-                            }}
-                          />
                           <Button
                             type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => document.getElementById(`project-image-${idx}`)?.click()}
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:text-destructive flex-shrink-0"
+                            onClick={() => {
+                              const newProjects = formData.projects.filter((_: any, i: number) => i !== idx);
+                              setFormData((prev) => ({ ...prev, projects: newProjects }));
+                            }}
                           >
-                            <Upload size={14} className="mr-2" />
-                            {project.image ? 'Change Thumbnail' : 'Upload Thumbnail'}
+                            <Trash2 size={16} />
                           </Button>
+                        </div>
+
+                        {/* Media Upload Controls */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          {/* Thumbnail Upload */}
+                          <div className="space-y-2">
+                            <label className="text-xs font-medium text-muted-foreground">Thumbnail</label>
+                            <input
+                              type="file"
+                              accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                              className="hidden"
+                              id={`project-thumbnail-${idx}`}
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                
+                                if (file.size > 100 * 1024 * 1024) {
+                                  toast({ title: 'File too large', description: 'Max 100MB', variant: 'destructive' });
+                                  return;
+                                }
+                                
+                                try {
+                                  const fileExt = file.name.split('.').pop();
+                                  const fileName = `project-thumb-${idx}-${Date.now()}.${fileExt}`;
+                                  const filePath = `sections/projects/${fileName}`;
+                                  
+                                  const { error } = await supabase.storage.from('cms-uploads').upload(filePath, file, { upsert: true });
+                                  if (error) throw error;
+                                  
+                                  const { data: { publicUrl } } = supabase.storage.from('cms-uploads').getPublicUrl(filePath);
+                                  
+                                  const newProjects = [...formData.projects];
+                                  newProjects[idx] = { ...newProjects[idx], image: publicUrl };
+                                  setFormData((prev) => ({ ...prev, projects: newProjects }));
+                                  
+                                  toast({ title: 'Thumbnail uploaded', description: `Updated ${project.title || 'project'} thumbnail` });
+                                } catch (err) {
+                                  toast({ title: 'Upload failed', description: 'Please try again', variant: 'destructive' });
+                                }
+                              }}
+                            />
+                            <div 
+                              className="border-2 border-dashed border-border rounded-lg p-3 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                              onClick={() => document.getElementById(`project-thumbnail-${idx}`)?.click()}
+                            >
+                              {project.image ? (
+                                <div className="space-y-1">
+                                  <img src={project.image} alt="Thumbnail" className="w-full h-16 object-cover rounded" />
+                                  <p className="text-xs text-muted-foreground">Change</p>
+                                </div>
+                              ) : (
+                                <div className="space-y-1">
+                                  <ImageIcon className="w-5 h-5 mx-auto text-muted-foreground" />
+                                  <p className="text-xs text-muted-foreground">Upload</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Main Image Upload */}
+                          <div className="space-y-2">
+                            <label className="text-xs font-medium text-muted-foreground">Main Image</label>
+                            <input
+                              type="file"
+                              accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                              className="hidden"
+                              id={`project-mainimage-${idx}`}
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                
+                                if (file.size > 100 * 1024 * 1024) {
+                                  toast({ title: 'File too large', description: 'Max 100MB', variant: 'destructive' });
+                                  return;
+                                }
+                                
+                                try {
+                                  const fileExt = file.name.split('.').pop();
+                                  const fileName = `project-main-${idx}-${Date.now()}.${fileExt}`;
+                                  const filePath = `sections/projects/${fileName}`;
+                                  
+                                  const { error } = await supabase.storage.from('cms-uploads').upload(filePath, file, { upsert: true });
+                                  if (error) throw error;
+                                  
+                                  const { data: { publicUrl } } = supabase.storage.from('cms-uploads').getPublicUrl(filePath);
+                                  
+                                  const newProjects = [...formData.projects];
+                                  newProjects[idx] = { ...newProjects[idx], mainImage: publicUrl };
+                                  setFormData((prev) => ({ ...prev, projects: newProjects }));
+                                  
+                                  toast({ title: 'Main image uploaded', description: `Updated ${project.title || 'project'} main image` });
+                                } catch (err) {
+                                  toast({ title: 'Upload failed', description: 'Please try again', variant: 'destructive' });
+                                }
+                              }}
+                            />
+                            <div 
+                              className="border-2 border-dashed border-border rounded-lg p-3 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                              onClick={() => document.getElementById(`project-mainimage-${idx}`)?.click()}
+                            >
+                              {project.mainImage ? (
+                                <div className="space-y-1">
+                                  <img src={project.mainImage} alt="Main" className="w-full h-16 object-cover rounded" />
+                                  <p className="text-xs text-muted-foreground">Change</p>
+                                </div>
+                              ) : (
+                                <div className="space-y-1">
+                                  <ImageIcon className="w-5 h-5 mx-auto text-muted-foreground" />
+                                  <p className="text-xs text-muted-foreground">Upload</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Video Upload */}
+                          <div className="space-y-2">
+                            <label className="text-xs font-medium text-muted-foreground">Video (Optional)</label>
+                            <input
+                              type="file"
+                              accept="video/mp4,video/webm,video/quicktime,video/x-msvideo"
+                              className="hidden"
+                              id={`project-video-${idx}`}
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                
+                                if (file.size > 100 * 1024 * 1024) {
+                                  toast({ title: 'File too large', description: 'Max 100MB', variant: 'destructive' });
+                                  return;
+                                }
+                                
+                                try {
+                                  const fileExt = file.name.split('.').pop();
+                                  const fileName = `project-video-${idx}-${Date.now()}.${fileExt}`;
+                                  const filePath = `sections/projects/videos/${fileName}`;
+                                  
+                                  toast({ title: 'Uploading video...', description: 'Please wait' });
+                                  
+                                  const { error } = await supabase.storage.from('cms-uploads').upload(filePath, file, { upsert: true });
+                                  if (error) throw error;
+                                  
+                                  const { data: { publicUrl } } = supabase.storage.from('cms-uploads').getPublicUrl(filePath);
+                                  
+                                  const newProjects = [...formData.projects];
+                                  newProjects[idx] = { ...newProjects[idx], videoUrl: publicUrl };
+                                  setFormData((prev) => ({ ...prev, projects: newProjects }));
+                                  
+                                  toast({ title: 'Video uploaded', description: `Updated ${project.title || 'project'} video` });
+                                } catch (err) {
+                                  toast({ title: 'Upload failed', description: 'Please try again', variant: 'destructive' });
+                                }
+                              }}
+                            />
+                            <div 
+                              className="border-2 border-dashed border-border rounded-lg p-3 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                              onClick={() => document.getElementById(`project-video-${idx}`)?.click()}
+                            >
+                              {project.videoUrl ? (
+                                <div className="space-y-1">
+                                  <video src={project.videoUrl} className="w-full h-16 object-cover rounded" muted />
+                                  <p className="text-xs text-muted-foreground">Change</p>
+                                </div>
+                              ) : (
+                                <div className="space-y-1">
+                                  <Video className="w-5 h-5 mx-auto text-muted-foreground" />
+                                  <p className="text-xs text-muted-foreground">Upload</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -726,7 +863,7 @@ export const PageSectionCards = ({
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        const newProjects = [...(formData.projects || []), { id: Date.now(), title: '', category: '', image: '' }];
+                        const newProjects = [...(formData.projects || []), { id: Date.now(), title: '', category: '', image: '', mainImage: '', videoUrl: '' }];
                         setFormData((prev) => ({ ...prev, projects: newProjects }));
                       }}
                     >
