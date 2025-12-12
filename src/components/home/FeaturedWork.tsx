@@ -24,6 +24,15 @@ const defaultProjects = [
   { id: 6, title: "Podcast Studio Session", category: "Podcast", image: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&q=80" },
 ];
 
+interface Project {
+  id: number;
+  title: string;
+  category: string;
+  image: string;
+  mainImage?: string;
+  videoUrl?: string;
+}
+
 export const FeaturedWork = () => {
   const { data: section } = useSectionContent('home', 'featured-work');
   const content = section?.content;
@@ -31,7 +40,7 @@ export const FeaturedWork = () => {
   const label = getContentValue(content, 'label', 'Portfolio');
   const heading = getContentValue(content, 'heading', 'Our Work Speaks For Us');
   const subheading = getContentValue(content, 'subheading', 'A curated selection of our best photography, videography, and documentary work.');
-  const projects = getContentValue(content, 'projects', defaultProjects) as { id: number; title: string; category: string; image: string }[];
+  const projects = getContentValue(content, 'projects', defaultProjects) as Project[];
 
   return (
     <section className="section-padding bg-card relative">
@@ -39,17 +48,21 @@ export const FeaturedWork = () => {
         <SectionHeading label={label} title={heading} subtitle={subheading} />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project, index) => {
-            const video = videoMap[project.category];
-            const hasVideo = !!video;
+            // Priority: 1. Custom video from CMS, 2. Category-based video, 3. Main image, 4. Thumbnail
+            const customVideo = project.videoUrl;
+            const categoryVideo = videoMap[project.category];
+            const displayVideo = customVideo || categoryVideo;
+            const displayImage = project.mainImage || project.image;
+            const hasVideo = !!displayVideo;
             
             return (
               <motion.div key={project.id} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: index * 0.1 }} className={`group relative overflow-hidden rounded-lg ${index === 0 || index === 3 ? "md:row-span-2" : ""}`}>
                 <Link to={`/portfolio/${project.id}`} className="block">
                   <div className={`relative ${index === 0 || index === 3 ? "aspect-[3/4]" : "aspect-video"}`}>
                     {hasVideo ? (
-                      <video src={video} autoPlay loop muted playsInline preload="auto" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                      <video src={displayVideo} autoPlay loop muted playsInline preload="auto" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                     ) : (
-                      <img src={project.image} alt={project.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                      <img src={displayImage} alt={project.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
                     <div className="absolute bottom-0 left-0 right-0 p-6">
