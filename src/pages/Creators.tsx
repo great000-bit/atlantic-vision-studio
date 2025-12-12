@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   Check,
@@ -9,10 +9,17 @@ import {
   ChevronDown,
   Send,
   CheckCircle,
+  Upload,
+  X,
+  FileText,
+  Image as ImageIcon,
+  Video,
 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SEO } from "@/components/SEO";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const benefits = [
   {
@@ -73,13 +80,116 @@ const faqs = [
   },
 ];
 
-const PROFORMS_ENDPOINT = "https://app.proforms.top/f/pr1274f8b5";
+const ACCEPTED_FILE_TYPES = [
+  // Documents
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "text/plain",
+  // Images
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "image/svg+xml",
+  // Videos
+  "video/mp4",
+  "video/quicktime",
+  "video/x-msvideo",
+  "video/webm",
+];
+
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB per file
+const MAX_FILES = 10;
+
+const getFileIcon = (type: string) => {
+  if (type.startsWith("image/")) return ImageIcon;
+  if (type.startsWith("video/")) return Video;
+  return FileText;
+};
 
 const Creators = () => {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    
+    // Validate files
+    const validFiles: File[] = [];
+    for (const file of files) {
+      if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
+        toast({
+          title: "Invalid file type",
+          description: `${file.name} is not a supported file type.`,
+          variant: "destructive",
+        });
+        continue;
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        toast({
+          title: "File too large",
+          description: `${file.name} exceeds the 50MB limit.`,
+          variant: "destructive",
+        });
+        continue;
+      }
+      validFiles.push(file);
+    }
+
+    if (uploadedFiles.length + validFiles.length > MAX_FILES) {
+      toast({
+        title: "Too many files",
+        description: `You can upload a maximum of ${MAX_FILES} files.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploadedFiles((prev) => [...prev, ...validFiles]);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const uploadFilesToStorage = async (): Promise<string[]> => {
+    const urls: string[] = [];
+    
+    for (const file of uploadedFiles) {
+      const timestamp = Date.now();
+      const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+      const filePath = `applications/${timestamp}_${sanitizedName}`;
+      
+      const { data, error } = await supabase.storage
+        .from("creator-uploads")
+        .upload(filePath, file);
+      
+      if (error) {
+        console.error("Upload error:", error);
+        throw new Error(`Failed to upload ${file.name}`);
+      }
+      
+      const { data: urlData } = supabase.storage
+        .from("creator-uploads")
+        .getPublicUrl(data.path);
+      
+      urls.push(urlData.publicUrl);
+    }
+    
+    return urls;
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -89,33 +199,59 @@ const Creators = () => {
     try {
       const formEl = e.currentTarget;
       const formData = new FormData(formEl);
-      const payload = Object.fromEntries(formData.entries());
+      
+      // Upload files first
+      setUploading(true);
+      let fileUrls: string[] = [];
+      if (uploadedFiles.length > 0) {
+        fileUrls = await uploadFilesToStorage();
+      }
+      setUploading(false);
 
-      const res = await fetch(PROFORMS_ENDPOINT, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      // Insert application into database
+      const { error: insertError } = await supabase
+        .from("creator_applications")
+        .insert({
+          name: formData.get("name") as string,
+          email: formData.get("email") as string,
+          role: formData.get("role") as string,
+          location: formData.get("location") as string,
+          portfolio_link: (formData.get("portfolio") as string) || null,
+          experience: formData.get("experience") as string,
+          file_urls: fileUrls,
+        });
 
-      if (!res.ok) {
-        let msg = `Submission failed (${res.status})`;
-        try {
-          const json = await res.json();
-          if (json?.message) msg = json.message;
-        } catch {
-          /* ignore */
-        }
-        throw new Error(msg);
+      if (insertError) {
+        console.error("Insert error:", insertError);
+        throw new Error("Failed to submit application. Please try again.");
+      }
+
+      // Try to send email notification (non-blocking)
+      try {
+        await supabase.functions.invoke("send-creator-notification", {
+          body: {
+            name: formData.get("name"),
+            email: formData.get("email"),
+            role: formData.get("role"),
+            location: formData.get("location"),
+            portfolio_link: formData.get("portfolio") || null,
+            experience: formData.get("experience"),
+            file_urls: fileUrls,
+          },
+        });
+      } catch (emailError) {
+        console.log("Email notification skipped:", emailError);
+        // Don't fail the submission if email fails
       }
 
       setSubmitted(true);
       formEl.reset();
+      setUploadedFiles([]);
     } catch (err: any) {
       setError(err?.message || "An error occurred while submitting the form.");
     } finally {
       setSubmitting(false);
+      setUploading(false);
     }
   };
 
@@ -376,16 +512,76 @@ const Creators = () => {
 
               <div>
                 <label htmlFor="creator-portfolio" className="block text-sm font-medium text-foreground mb-2">
-                  Portfolio Link <span className="text-primary" aria-label="required">*</span>
+                  Portfolio Link <span className="text-muted-foreground text-xs">(Optional)</span>
                 </label>
                 <input
                   type="url"
                   id="creator-portfolio"
                   name="portfolio"
-                  required
                   className="w-full px-4 py-3 bg-background border border-border rounded-lg input-cinematic"
                   placeholder="https://yourportfolio.com"
                 />
+              </div>
+
+              {/* File Upload Section */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Upload Files <span className="text-muted-foreground text-xs">(Optional - CV, Portfolio, Work Samples)</span>
+                </label>
+                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileSelect}
+                    multiple
+                    accept={ACCEPTED_FILE_TYPES.join(",")}
+                    className="hidden"
+                    id="file-upload"
+                  />
+                  <label htmlFor="file-upload" className="cursor-pointer">
+                    <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                    <p className="text-foreground font-medium mb-1">
+                      Click to upload or drag and drop
+                    </p>
+                    <p className="text-muted-foreground text-sm">
+                      PDF, DOC, Images, Videos (Max 50MB each, up to 10 files)
+                    </p>
+                  </label>
+                </div>
+
+                {/* Uploaded Files List */}
+                {uploadedFiles.length > 0 && (
+                  <div className="mt-4 space-y-2">
+                    {uploadedFiles.map((file, index) => {
+                      const FileIcon = getFileIcon(file.type);
+                      return (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between bg-background border border-border rounded-lg px-4 py-3"
+                        >
+                          <div className="flex items-center gap-3">
+                            <FileIcon className="w-5 h-5 text-primary" />
+                            <div>
+                              <p className="text-foreground text-sm font-medium truncate max-w-[200px]">
+                                {file.name}
+                              </p>
+                              <p className="text-muted-foreground text-xs">
+                                {(file.size / 1024 / 1024).toFixed(2)} MB
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeFile(index)}
+                            className="text-muted-foreground hover:text-destructive transition-colors"
+                          >
+                            <X className="w-5 h-5" />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               <div>
@@ -411,10 +607,12 @@ const Creators = () => {
 
               <button
                 type="submit"
-                disabled={submitting}
+                disabled={submitting || uploading}
                 className="w-full btn-gold flex items-center justify-center gap-2 py-4 text-sm uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {submitting ? "Submitting..." : (
+                {submitting ? (
+                  uploading ? "Uploading files..." : "Submitting..."
+                ) : (
                   <>
                     Submit Application
                     <Send size={16} aria-hidden="true" />
@@ -430,53 +628,53 @@ const Creators = () => {
         <div className="container mx-auto px-6 lg:px-8">
           <div className="max-w-3xl mx-auto">
             <SectionHeading
-              label="FAQs"
-              title="Common Questions"
-              subtitle="Everything you need to know about joining the collective."
+              label="FAQ"
+              title="Questions & Answers"
+              subtitle="Everything you need to know about joining and working with the collective."
             />
 
             <div className="space-y-4" role="list">
               {faqs.map((faq, index) => (
                 <motion.div
-                  key={faq.question}
+                  key={index}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="bg-card border border-border rounded-xl overflow-hidden"
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  className="border border-border rounded-xl overflow-hidden"
                   role="listitem"
                 >
                   <button
                     onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
-                    className="w-full px-6 py-5 flex items-center justify-between text-left"
+                    className="w-full flex items-center justify-between p-5 text-left bg-card hover:bg-card/80 transition-colors"
                     aria-expanded={expandedFaq === index}
                     aria-controls={`faq-answer-${index}`}
                   >
-                    <span className="font-heading font-semibold text-foreground pr-4">
+                    <span className="font-heading text-foreground font-medium pr-4">
                       {faq.question}
                     </span>
                     <ChevronDown
                       size={20}
-                      className={`text-primary flex-shrink-0 transition-transform duration-300 ${
+                      className={`text-primary flex-shrink-0 transition-transform ${
                         expandedFaq === index ? "rotate-180" : ""
                       }`}
                       aria-hidden="true"
                     />
                   </button>
-                  {expandedFaq === index && (
-                    <motion.div
-                      id={`faq-answer-${index}`}
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="px-6 pb-5"
-                    >
-                      <p className="text-muted-foreground leading-relaxed">
-                        {faq.answer}
-                      </p>
-                    </motion.div>
-                  )}
+                  <motion.div
+                    id={`faq-answer-${index}`}
+                    initial={false}
+                    animate={{
+                      height: expandedFaq === index ? "auto" : 0,
+                      opacity: expandedFaq === index ? 1 : 0,
+                    }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="p-5 pt-0 text-muted-foreground leading-relaxed">
+                      {faq.answer}
+                    </div>
+                  </motion.div>
                 </motion.div>
               ))}
             </div>
