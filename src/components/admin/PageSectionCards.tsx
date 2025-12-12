@@ -520,6 +520,222 @@ export const PageSectionCards = ({
                   </div>
                 )}
 
+                {/* Benefits Editor (Why Choose Us section) */}
+                {Array.isArray(formData.benefits) && (
+                  <div className="space-y-4">
+                    <label className="block text-sm font-medium text-foreground">
+                      Benefits / Features
+                    </label>
+                    {formData.benefits.map((benefit: { icon: string; title: string; description: string }, idx: number) => (
+                      <div key={idx} className="p-4 bg-muted/50 rounded-lg space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
+                          <Input
+                            value={benefit.title}
+                            onChange={(e) => {
+                              const newBenefits = [...formData.benefits];
+                              newBenefits[idx] = { ...newBenefits[idx], title: e.target.value };
+                              setFormData((prev) => ({ ...prev, benefits: newBenefits }));
+                            }}
+                            placeholder="Title"
+                          />
+                          <Input
+                            value={benefit.icon}
+                            onChange={(e) => {
+                              const newBenefits = [...formData.benefits];
+                              newBenefits[idx] = { ...newBenefits[idx], icon: e.target.value };
+                              setFormData((prev) => ({ ...prev, benefits: newBenefits }));
+                            }}
+                            placeholder="Icon (Users, Award, Shield, Zap, Clock, Check)"
+                          />
+                        </div>
+                        <Textarea
+                          value={benefit.description}
+                          onChange={(e) => {
+                            const newBenefits = [...formData.benefits];
+                            newBenefits[idx] = { ...newBenefits[idx], description: e.target.value };
+                            setFormData((prev) => ({ ...prev, benefits: newBenefits }));
+                          }}
+                          placeholder="Description"
+                          rows={2}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Why Choose Us Images Editor */}
+                {Array.isArray(formData.images) && (
+                  <div className="space-y-4">
+                    <label className="block text-sm font-medium text-foreground">
+                      Section Images
+                    </label>
+                    <div className="grid grid-cols-2 gap-4">
+                      {formData.images.map((imageUrl: string, idx: number) => (
+                        <div key={idx} className="relative group">
+                          <div className="aspect-square rounded-lg overflow-hidden bg-muted">
+                            {imageUrl ? (
+                              <img src={imageUrl} alt={`Image ${idx + 1}`} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <ImageIcon className="w-8 h-8 text-muted-foreground" />
+                              </div>
+                            )}
+                          </div>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            id={`section-image-${idx}`}
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              
+                              const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                              if (!validTypes.includes(file.type)) {
+                                toast({ title: 'Invalid file', description: 'Please upload an image', variant: 'destructive' });
+                                return;
+                              }
+                              
+                              try {
+                                const fileExt = file.name.split('.').pop();
+                                const fileName = `section-image-${idx}-${Date.now()}.${fileExt}`;
+                                const filePath = `sections/images/${fileName}`;
+                                
+                                const { error } = await supabase.storage.from('cms-uploads').upload(filePath, file, { upsert: true });
+                                if (error) throw error;
+                                
+                                const { data: { publicUrl } } = supabase.storage.from('cms-uploads').getPublicUrl(filePath);
+                                
+                                const newImages = [...formData.images];
+                                newImages[idx] = publicUrl;
+                                setFormData((prev) => ({ ...prev, images: newImages }));
+                                
+                                toast({ title: 'Image uploaded', description: `Updated image ${idx + 1}` });
+                              } catch (err) {
+                                toast({ title: 'Upload failed', description: 'Please try again', variant: 'destructive' });
+                              }
+                            }}
+                          />
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => document.getElementById(`section-image-${idx}`)?.click()}
+                          >
+                            <Upload size={14} className="mr-1" />
+                            Replace
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Projects Editor (Featured Work / Portfolio section) */}
+                {Array.isArray(formData.projects) && (
+                  <div className="space-y-4">
+                    <label className="block text-sm font-medium text-foreground">
+                      Portfolio Projects
+                    </label>
+                    {formData.projects.map((project: { id: number; title: string; category: string; image: string }, idx: number) => (
+                      <div key={idx} className="p-4 bg-muted/50 rounded-lg space-y-3">
+                        <div className="flex items-center gap-4">
+                          <div className="relative w-24 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                            {project.image ? (
+                              <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <ImageIcon className="w-6 h-6 text-muted-foreground" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1 space-y-2">
+                            <Input
+                              value={project.title}
+                              onChange={(e) => {
+                                const newProjects = [...formData.projects];
+                                newProjects[idx] = { ...newProjects[idx], title: e.target.value };
+                                setFormData((prev) => ({ ...prev, projects: newProjects }));
+                              }}
+                              placeholder="Project Title"
+                              className="h-9"
+                            />
+                            <Input
+                              value={project.category}
+                              onChange={(e) => {
+                                const newProjects = [...formData.projects];
+                                newProjects[idx] = { ...newProjects[idx], category: e.target.value };
+                                setFormData((prev) => ({ ...prev, projects: newProjects }));
+                              }}
+                              placeholder="Category (Tourism Media, Event Coverage, etc.)"
+                              className="h-9"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            id={`project-image-${idx}`}
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              
+                              const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                              if (!validTypes.includes(file.type)) {
+                                toast({ title: 'Invalid file', description: 'Please upload an image', variant: 'destructive' });
+                                return;
+                              }
+                              
+                              try {
+                                const fileExt = file.name.split('.').pop();
+                                const fileName = `project-${idx}-${Date.now()}.${fileExt}`;
+                                const filePath = `sections/projects/${fileName}`;
+                                
+                                const { error } = await supabase.storage.from('cms-uploads').upload(filePath, file, { upsert: true });
+                                if (error) throw error;
+                                
+                                const { data: { publicUrl } } = supabase.storage.from('cms-uploads').getPublicUrl(filePath);
+                                
+                                const newProjects = [...formData.projects];
+                                newProjects[idx] = { ...newProjects[idx], image: publicUrl };
+                                setFormData((prev) => ({ ...prev, projects: newProjects }));
+                                
+                                toast({ title: 'Image uploaded', description: `Updated ${project.title} thumbnail` });
+                              } catch (err) {
+                                toast({ title: 'Upload failed', description: 'Please try again', variant: 'destructive' });
+                              }
+                            }}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => document.getElementById(`project-image-${idx}`)?.click()}
+                          >
+                            <Upload size={14} className="mr-2" />
+                            {project.image ? 'Change Thumbnail' : 'Upload Thumbnail'}
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const newProjects = [...(formData.projects || []), { id: Date.now(), title: '', category: '', image: '' }];
+                        setFormData((prev) => ({ ...prev, projects: newProjects }));
+                      }}
+                    >
+                      <Plus size={14} className="mr-2" />
+                      Add Project
+                    </Button>
+                  </div>
+                )}
+
                 {/* Team Members Editor */}
                 {Array.isArray(formData.members) && (
                   <div className="space-y-4">
@@ -560,6 +776,18 @@ export const PageSectionCards = ({
                               className="h-9"
                             />
                           </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:text-destructive"
+                            onClick={() => {
+                              const newMembers = formData.members.filter((_: any, i: number) => i !== idx);
+                              setFormData((prev) => ({ ...prev, members: newMembers }));
+                            }}
+                          >
+                            <Trash2 size={16} />
+                          </Button>
                         </div>
                         <div>
                           <input
