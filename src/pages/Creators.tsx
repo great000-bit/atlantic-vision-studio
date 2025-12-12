@@ -80,29 +80,9 @@ const faqs = [
   },
 ];
 
-const ACCEPTED_FILE_TYPES = [
-  // Documents
-  "application/pdf",
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  "application/vnd.ms-excel",
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  "text/plain",
-  // Images
-  "image/jpeg",
-  "image/png",
-  "image/gif",
-  "image/webp",
-  "image/svg+xml",
-  // Videos
-  "video/mp4",
-  "video/quicktime",
-  "video/x-msvideo",
-  "video/webm",
-];
-
-const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB per file
-const MAX_FILES = 10;
+// No file type restrictions - accept all files
+const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB per file (increased)
+const MAX_FILES = 20; // Allow more files
 
 const getFileIcon = (type: string) => {
   if (type.startsWith("image/")) return ImageIcon;
@@ -123,21 +103,13 @@ const Creators = () => {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     
-    // Validate files
+    // Validate files - no file type restrictions, only size
     const validFiles: File[] = [];
     for (const file of files) {
-      if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
-        toast({
-          title: "Invalid file type",
-          description: `${file.name} is not a supported file type.`,
-          variant: "destructive",
-        });
-        continue;
-      }
       if (file.size > MAX_FILE_SIZE) {
         toast({
           title: "File too large",
-          description: `${file.name} exceeds the 50MB limit.`,
+          description: `${file.name} exceeds the 100MB limit.`,
           variant: "destructive",
         });
         continue;
@@ -534,7 +506,6 @@ const Creators = () => {
                     ref={fileInputRef}
                     onChange={handleFileSelect}
                     multiple
-                    accept={ACCEPTED_FILE_TYPES.join(",")}
                     className="hidden"
                     id="file-upload"
                   />
@@ -544,7 +515,7 @@ const Creators = () => {
                       Click to upload or drag and drop
                     </p>
                     <p className="text-muted-foreground text-sm">
-                      PDF, DOC, Images, Videos (Max 50MB each, up to 10 files)
+                      All file types accepted (Max 100MB each, up to 20 files)
                     </p>
                   </label>
                 </div>
