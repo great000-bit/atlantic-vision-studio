@@ -59,6 +59,48 @@ export type Database = {
         }
         Relationships: []
       }
+      creator_applications: {
+        Row: {
+          created_at: string
+          email: string
+          experience: string
+          file_urls: string[] | null
+          id: string
+          location: string
+          name: string
+          portfolio_link: string | null
+          role: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          experience: string
+          file_urls?: string[] | null
+          id?: string
+          location: string
+          name: string
+          portfolio_link?: string | null
+          role: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          experience?: string
+          file_urls?: string[] | null
+          id?: string
+          location?: string
+          name?: string
+          portfolio_link?: string | null
+          role?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       image_assets: {
         Row: {
           alt_text: string | null
