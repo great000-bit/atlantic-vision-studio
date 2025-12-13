@@ -15,12 +15,14 @@ import {
   Image as ImageIcon,
   Video,
 } from "lucide-react";
-import { Layout } from "@/components/layout/Layout";
-import { SectionHeading } from "@/components/ui/SectionHeading";
-import { SEO } from "@/components/SEO";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+// Assuming these imports are correctly aliased in your project
+import { Layout } from "@/components/layout/Layout"; 
+import { SectionHeading } from "@/components/ui/SectionHeading"; 
+import { SEO } from "@/components/SEO"; 
+import { supabase } from "@/integrations/supabase/client"; 
+import { useToast } from "@/hooks/use-toast"; 
 
+// --- Constants ---
 const benefits = [
   {
     icon: Briefcase,
@@ -81,15 +83,21 @@ const faqs = [
 ];
 
 // No file type restrictions - accept all files
-const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB per file (increased)
-const MAX_FILES = 20; // Allow more files
+const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB per file
+const MAX_FILES = 20; // Allow up to 20 files
 
+/**
+ * Helper function to determine the appropriate icon for a file based on its MIME type.
+ * @param type The MIME type of the file (e.g., 'image/jpeg', 'application/pdf').
+ * @returns The LucideReact icon component.
+ */
 const getFileIcon = (type: string) => {
   if (type.startsWith("image/")) return ImageIcon;
   if (type.startsWith("video/")) return Video;
   return FileText;
 };
 
+// --- Main Component ---
 const Creators = () => {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -97,19 +105,26 @@ const Creators = () => {
   const [error, setError] = useState<string | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [experienceText, setExperienceText] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
+  const MIN_EXPERIENCE_LENGTH = 100;
+  const MAX_EXPERIENCE_LENGTH = 2000;
+
+  /**
+   * Handles the selection of files from the input element, performing validation.
+   */
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     
-    // Validate files - no file type restrictions, only size
+    // 1. Validate files - only size restriction
     const validFiles: File[] = [];
     for (const file of files) {
       if (file.size > MAX_FILE_SIZE) {
         toast({
           title: "File too large",
-          description: `${file.name} exceeds the 100MB limit.`,
+          description: `${file.name} exceeds the ${MAX_FILE_SIZE / 1024 / 1024}MB limit.`,
           variant: "destructive",
         });
         continue;
@@ -117,6 +132,7 @@ const Creators = () => {
       validFiles.push(file);
     }
 
+    // 2. Validate total file count
     if (uploadedFiles.length + validFiles.length > MAX_FILES) {
       toast({
         title: "Too many files",
@@ -126,36 +142,54 @@ const Creators = () => {
       return;
     }
 
+    // 3. Update state and clear the input value to allow the same file to be selected again
     setUploadedFiles((prev) => [...prev, ...validFiles]);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
+  /**
+   * Removes a file from the list of files to be uploaded.
+   * @param index The index of the file to remove.
+   */
   const removeFile = (index: number) => {
     setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
+  /**
+   * Uploads all files in the uploadedFiles state to Supabase Storage.
+   * @returns A promise that resolves to an array of public URLs for the uploaded files.
+   */
   const uploadFilesToStorage = async (): Promise<string[]> => {
     const urls: string[] = [];
     
-    for (const file of uploadedFiles) {
-      const timestamp = Date.now();
-      const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-      const filePath = `applications/${timestamp}_${sanitizedName}`;
+    for (let i = 0; i < uploadedFiles.length; i++) {
+      const file = uploadedFiles[i];
+      // Create a unique path: applications/timestamp_index_sanitizedname
+      const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, "");
+      const filePath = `applications/${Date.now()}_${i}_${sanitizedName}`;
       
       const { data, error } = await supabase.storage
         .from("creator-uploads")
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: false, // Prevent overwriting
+        });
       
       if (error) {
-        console.error("Upload error:", error);
-        throw new Error(`Failed to upload ${file.name}`);
+        console.error("Supabase Upload error:", error);
+        throw new Error(`Failed to upload file ${file.name}. Please ensure your Supabase Storage bucket has the correct RLS policy.`);
       }
       
+      // Get the public URL for the newly uploaded file
       const { data: urlData } = supabase.storage
         .from("creator-uploads")
         .getPublicUrl(data.path);
+      
+      if (!urlData || !urlData.publicUrl) {
+          throw new Error(`Failed to retrieve public URL for ${file.name}`);
+      }
       
       urls.push(urlData.publicUrl);
     }
@@ -163,6 +197,9 @@ const Creators = () => {
     return urls;
   };
 
+  /**
+   * Handles the overall form submission, including file upload and sending to ProForms.
+   */
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
@@ -172,7 +209,7 @@ const Creators = () => {
       const formEl = e.currentTarget;
       const formData = new FormData(formEl);
       
-      // Upload files first
+      // 1. Upload files first if any
       setUploading(true);
       let fileUrls: string[] = [];
       if (uploadedFiles.length > 0) {
@@ -180,59 +217,86 @@ const Creators = () => {
       }
       setUploading(false);
 
-      // Insert application into database
-      const { error: insertError } = await supabase
-        .from("creator_applications")
-        .insert({
-          name: formData.get("name") as string,
-          email: formData.get("email") as string,
-          role: formData.get("role") as string,
-          location: formData.get("location") as string,
-          portfolio_link: (formData.get("portfolio") as string) || null,
-          experience: formData.get("experience") as string,
+      // 2. Prepare form data for ProForms
+      const name = formData.get("name") as string;
+      const email = formData.get("email") as string;
+      const role = formData.get("role") as string;
+      const location = formData.get("location") as string;
+      const portfolio = formData.get("portfolio") as string;
+      const experience = formData.get("experience") as string;
+
+      // 3. Insert application into database (optional - remove if not needed)
+      try {
+        await supabase.from("creator_applications").insert({
+          name,
+          email,
+          role,
+          location,
+          portfolio_link: portfolio || null,
+          experience,
           file_urls: fileUrls,
         });
+      } catch (dbError) {
+        console.log("Database insert skipped:", dbError);
+        // Continue with email submission even if DB fails
+      }
 
-      if (insertError) {
-        console.error("Insert error:", insertError);
+      // 4. Send to ProForms endpoint
+      const proformsData = new FormData();
+      proformsData.append("name", name);
+      proformsData.append("email", email);
+      proformsData.append("role", role);
+      proformsData.append("location", location);
+      proformsData.append("portfolio", portfolio);
+      proformsData.append("experience", experience);
+      
+      // Add file URLs to the form data
+      if (fileUrls.length > 0) {
+        proformsData.append("file_urls", fileUrls.join(", "));
+      }
+
+      // Replace 'YOUR_PROFORMS_ENDPOINT' with your actual ProForms form endpoint
+      const proformsEndpoint = "https://app.proforms.top/f/pr1274f8b5";
+      
+      const response = await fetch(proformsEndpoint, {
+        method: "POST",
+        body: proformsData,
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (!response.ok) {
         throw new Error("Failed to submit application. Please try again.");
       }
 
-      // Try to send email notification (non-blocking)
-      try {
-        await supabase.functions.invoke("send-creator-notification", {
-          body: {
-            name: formData.get("name"),
-            email: formData.get("email"),
-            role: formData.get("role"),
-            location: formData.get("location"),
-            portfolio_link: formData.get("portfolio") || null,
-            experience: formData.get("experience"),
-            file_urls: fileUrls,
-          },
-        });
-      } catch (emailError) {
-        console.log("Email notification skipped:", emailError);
-        // Don't fail the submission if email fails
-      }
-
       setSubmitted(true);
-      formEl.reset();
+      // Clear states/inputs after successful submission
       setUploadedFiles([]);
+      setExperienceText("");
+      formEl.reset();
     } catch (err: any) {
-      setError(err?.message || "An error occurred while submitting the form.");
+      // General error handling for upload or submission failures
+      setError(err?.message || "An unexpected error occurred while submitting the form.");
+      toast({
+        title: "Submission Failed",
+        description: err?.message || "Please check your network and try again.",
+        variant: "destructive",
+      });
     } finally {
+      // Ensure loading states are cleared regardless of success or failure
       setSubmitting(false);
       setUploading(false);
     }
   };
 
+  // --- Render Submitted State ---
   if (submitted) {
     return (
       <Layout>
         <SEO
           title="Creators Collective"
-          description="Join Atlantic Creators Collective - a network of professional photographers, videographers, editors, and audio professionals."
+          description="Application successfully submitted to Atlantic Creators Collective."
           url="https://www.theatlanticcreators.com/creators"
         />
         <section className="pt-32 pb-20 bg-background min-h-screen flex items-center justify-center">
@@ -260,6 +324,7 @@ const Creators = () => {
     );
   }
 
+  // --- Render Main Application Form ---
   return (
     <Layout>
       <SEO
@@ -269,6 +334,7 @@ const Creators = () => {
         keywords="join creators collective, freelance videographer, freelance photographer, media production network, creator opportunities"
       />
 
+      {/* Hero Section */}
       <section className="pt-32 pb-20 bg-background relative overflow-hidden" aria-labelledby="creators-heading">
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal/30 to-transparent pointer-events-none" aria-hidden="true" />
         <div className="container mx-auto px-6 lg:px-8 relative z-10">
@@ -291,6 +357,7 @@ const Creators = () => {
         </div>
       </section>
 
+      {/* Benefits Section */}
       <section className="section-padding bg-card" aria-labelledby="benefits-heading">
         <div className="container mx-auto px-6 lg:px-8">
           <SectionHeading
@@ -325,6 +392,7 @@ const Creators = () => {
         </div>
       </section>
 
+      {/* Payment Portal Section */}
       <section className="section-padding bg-background" aria-labelledby="portal-heading">
         <div className="container mx-auto px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -397,6 +465,7 @@ const Creators = () => {
         </div>
       </section>
 
+      {/* Application Form Section */}
       <section className="section-padding bg-card" aria-labelledby="apply-heading">
         <div className="container mx-auto px-6 lg:px-8">
           <div className="max-w-2xl mx-auto">
@@ -458,8 +527,9 @@ const Creators = () => {
                     name="role"
                     required
                     className="w-full px-4 py-3 bg-background border border-border rounded-lg input-cinematic"
+                    defaultValue=""
                   >
-                    <option value="">Select your role</option>
+                    <option value="" disabled>Select your role</option>
                     {roles.map((role) => (
                       <option key={role} value={role}>{role}</option>
                     ))}
@@ -491,14 +561,14 @@ const Creators = () => {
                   id="creator-portfolio"
                   name="portfolio"
                   className="w-full px-4 py-3 bg-background border border-border rounded-lg input-cinematic"
-                  placeholder="https://yourportfolio.com"
+                  placeholder="https://yourportfolio.com (e.g., Behance, personal site)"
                 />
               </div>
 
               {/* File Upload Section */}
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Upload Files <span className="text-muted-foreground text-xs">(Optional - CV, Portfolio, Work Samples)</span>
+                  Upload Files <span className="text-muted-foreground text-xs">(Optional - CV, Work Samples, etc.)</span>
                 </label>
                 <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
                   <input
@@ -509,13 +579,13 @@ const Creators = () => {
                     className="hidden"
                     id="file-upload"
                   />
-                  <label htmlFor="file-upload" className="cursor-pointer">
+                  <label htmlFor="file-upload" className="cursor-pointer block">
                     <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
                     <p className="text-foreground font-medium mb-1">
                       Click to upload or drag and drop
                     </p>
                     <p className="text-muted-foreground text-sm">
-                      All file types accepted (Max 100MB each, up to 20 files)
+                      All file types accepted (Max {MAX_FILE_SIZE / 1024 / 1024}MB each, up to {MAX_FILES} files)
                     </p>
                   </label>
                 </div>
@@ -523,17 +593,20 @@ const Creators = () => {
                 {/* Uploaded Files List */}
                 {uploadedFiles.length > 0 && (
                   <div className="mt-4 space-y-2">
+                    <p className="text-sm font-medium text-foreground">Files to upload ({uploadedFiles.length}):</p>
                     {uploadedFiles.map((file, index) => {
                       const FileIcon = getFileIcon(file.type);
                       return (
                         <div
                           key={index}
                           className="flex items-center justify-between bg-background border border-border rounded-lg px-4 py-3"
+                          role="alert"
+                          aria-live="polite"
                         >
                           <div className="flex items-center gap-3">
-                            <FileIcon className="w-5 h-5 text-primary" />
+                            <FileIcon className="w-5 h-5 text-primary flex-shrink-0" />
                             <div>
-                              <p className="text-foreground text-sm font-medium truncate max-w-[200px]">
+                              <p className="text-foreground text-sm font-medium truncate max-w-[200px] sm:max-w-full">
                                 {file.name}
                               </p>
                               <p className="text-muted-foreground text-xs">
@@ -544,7 +617,8 @@ const Creators = () => {
                           <button
                             type="button"
                             onClick={() => removeFile(index)}
-                            className="text-muted-foreground hover:text-destructive transition-colors"
+                            className="text-muted-foreground hover:text-red-500 transition-colors p-1 rounded-full hover:bg-red-500/10"
+                            aria-label={`Remove file ${file.name}`}
                           >
                             <X className="w-5 h-5" />
                           </button>
@@ -564,25 +638,54 @@ const Creators = () => {
                   name="experience"
                   required
                   rows={4}
-                  maxLength={2000}
+                  minLength={MIN_EXPERIENCE_LENGTH}
+                  maxLength={MAX_EXPERIENCE_LENGTH}
+                  value={experienceText}
+                  onChange={(e) => setExperienceText(e.target.value)}
                   className="w-full px-4 py-3 bg-background border border-border rounded-lg input-cinematic resize-none"
                   placeholder="Tell us about your experience, notable projects, and what you bring to the collective..."
                 />
+                <div className="flex items-center justify-between mt-2">
+                  <p className={`text-xs ${experienceText.length < MIN_EXPERIENCE_LENGTH ? 'text-red-400' : 'text-muted-foreground'}`}>
+                    {experienceText.length < MIN_EXPERIENCE_LENGTH 
+                      ? `Minimum ${MIN_EXPERIENCE_LENGTH} characters required` 
+                      : 'Character count'}
+                  </p>
+                  <p className={`text-xs ${
+                    experienceText.length < MIN_EXPERIENCE_LENGTH 
+                      ? 'text-red-400 font-medium' 
+                      : experienceText.length >= MAX_EXPERIENCE_LENGTH 
+                      ? 'text-primary font-medium' 
+                      : 'text-muted-foreground'
+                  }`}>
+                    {experienceText.length} / {MAX_EXPERIENCE_LENGTH}
+                  </p>
+                </div>
               </div>
 
               {error && (
-                <div className="text-destructive text-sm">
-                  {error}
+                <div className="text-red-500 bg-red-500/10 p-3 rounded-lg text-sm" role="alert">
+                  <strong>Submission Error:</strong> {error}
                 </div>
               )}
 
               <button
                 type="submit"
-                disabled={submitting || uploading}
+                disabled={submitting || uploading || experienceText.length < MIN_EXPERIENCE_LENGTH}
                 className="w-full btn-gold flex items-center justify-center gap-2 py-4 text-sm uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? (
-                  uploading ? "Uploading files..." : "Submitting..."
+                  uploading ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                      Uploading files...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="animate-spin h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                      Submitting Application...
+                    </>
+                  )
                 ) : (
                   <>
                     Submit Application
@@ -595,6 +698,7 @@ const Creators = () => {
         </div>
       </section>
 
+      {/* FAQ Section */}
       <section className="section-padding bg-background" aria-labelledby="faq-heading">
         <div className="container mx-auto px-6 lg:px-8">
           <div className="max-w-3xl mx-auto">
