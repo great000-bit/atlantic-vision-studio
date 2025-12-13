@@ -60,8 +60,9 @@ export const creatorFormSchema = z.object({
   portfolio: z
     .string()
     .trim()
-    .min(1, "Portfolio link is required")
-    .url("Please enter a valid URL"),
+    .url("Please enter a valid URL")
+    .optional()
+    .or(z.literal("")),
   experience: z
     .string()
     .trim()
